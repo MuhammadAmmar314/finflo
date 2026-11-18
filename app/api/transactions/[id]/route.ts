@@ -97,7 +97,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = params;
+    const { id } = await Promise.resolve(params);
 
     const existingTx = await prisma.transaction.findUnique({
       where: { id },
@@ -108,7 +108,7 @@ export async function DELETE(
     }
 
     await prisma.$transaction(async (tx) => {
-      // Roll back wallet balance impact
+      // 1. Roll back wallet balance impact
       if (existingTx.type === 'expense') {
         await tx.wallet.update({
           where: { id: existingTx.walletId },
@@ -130,6 +130,51 @@ export async function DELETE(
         });
       }
 
+      // 2. Roll back linked Savings Goal if this was a savings deposit or withdrawal
+      let goalIdToUpdate = existingTx.savingsGoalId;
+      if (!goalIdToUpdate && existingTx.description) {
+        let extractedTitle = '';
+        if (existingTx.description.startsWith('Setor tabungan: ')) {
+          extractedTitle = existingTx.description.replace('Setor tabungan: ', '').trim();
+        } else if (existingTx.description.startsWith('Tarik tabungan: ')) {
+          extractedTitle = existingTx.description.replace('Tarik tabungan: ', '').trim();
+        }
+        if (extractedTitle) {
+          const matchedGoal = await tx.savingsGoal.findFirst({
+            where: {
+              userId: existingTx.userId,
+              title: { equals: extractedTitle, mode: 'insensitive' },
+            },
+          });
+          if (matchedGoal) {
+            goalIdToUpdate = matchedGoal.id;
+          }
+        }
+      }
+
+      if (goalIdToUpdate) {
+        const goal = await tx.savingsGoal.findUnique({
+          where: { id: goalIdToUpdate },
+        });
+        if (goal) {
+          if (existingTx.type === 'expense') {
+            // It was a deposit: rolling back means decrementing savings goal
+            const newAmount = Math.max(0, goal.currentAmount - existingTx.amount);
+            await tx.savingsGoal.update({
+              where: { id: goalIdToUpdate },
+              data: { currentAmount: newAmount },
+            });
+          } else if (existingTx.type === 'income') {
+            // It was a withdrawal: rolling back means returning money to savings goal
+            await tx.savingsGoal.update({
+              where: { id: goalIdToUpdate },
+              data: { currentAmount: { increment: existingTx.amount } },
+            });
+          }
+        }
+      }
+
+      // 3. Delete the transaction
       await tx.transaction.delete({
         where: { id },
       });

@@ -289,6 +289,26 @@ export async function apiDepositSavingsGoal(
   }
 }
 
+export async function apiWithdrawSavingsGoal(
+  goalId: string,
+  amount: number,
+  walletId: string,
+  userEmail: string
+): Promise<{ goal: SavingsGoal; wallet: Wallet; transaction: Transaction } | null> {
+  try {
+    const res = await fetch(`/api/savings-goals/${goalId}/withdraw`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount, walletId, email: userEmail }),
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.success ? json.data : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function apiSyncDatabase(payload: any): Promise<boolean> {
   try {
     const res = await fetch('/api/sync', {

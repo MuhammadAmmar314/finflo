@@ -39,6 +39,7 @@ import {
   apiUpdateSavingsGoal,
   apiDeleteSavingsGoal,
   apiDepositSavingsGoal,
+  apiWithdrawSavingsGoal,
   apiSyncDatabase,
 } from '@/lib/dbService';
 
@@ -62,6 +63,7 @@ import { AddDebtModal } from '@/components/modals/AddDebtModal';
 import { PayDebtModal } from '@/components/modals/PayDebtModal';
 import { AddSavingsGoalModal } from '@/components/modals/AddSavingsGoalModal';
 import { DepositGoalModal } from '@/components/modals/DepositGoalModal';
+import { WithdrawGoalModal } from '@/components/modals/WithdrawGoalModal';
 import { FreeTierModal } from '@/components/modals/FreeTierModal';
 import { ConfirmModal } from '@/components/modals/ConfirmModal';
 
@@ -96,6 +98,7 @@ export default function FinFloApp() {
   });
   const [isAddGoalOpen, setIsAddGoalOpen] = useState(false);
   const [depositGoalTarget, setDepositGoalTarget] = useState<SavingsGoal | null>(null);
+  const [withdrawGoalTarget, setWithdrawGoalTarget] = useState<SavingsGoal | null>(null);
 
   const [isFreeTierModalOpen, setIsFreeTierModalOpen] = useState(false);
   const [freeTierModalContent, setFreeTierModalContent] = useState<{
@@ -437,6 +440,54 @@ export default function FinFloApp() {
             return w;
           })
         );
+
+        // Sinkronisasi pembalikan saldo pada target tabungan terkait
+        let targetGoal: SavingsGoal | undefined;
+        if (tx.savingsGoalId) {
+          targetGoal = savingsGoals.find((g) => g.id === tx.savingsGoalId);
+        } else if (tx.description) {
+          let extractedTitle = '';
+          if (tx.description.startsWith('Setor tabungan: ')) {
+            extractedTitle = tx.description.replace('Setor tabungan: ', '').trim();
+          } else if (tx.description.startsWith('Tarik tabungan: ')) {
+            extractedTitle = tx.description.replace('Tarik tabungan: ', '').trim();
+          }
+          if (extractedTitle) {
+            targetGoal = savingsGoals.find(
+              (g) => g.title.toLowerCase() === extractedTitle.toLowerCase()
+            );
+          }
+        }
+
+        if (targetGoal) {
+          const goalId = targetGoal.id;
+          if (tx.type === 'expense') {
+            // Setoran dibatalkan: kurangi kembali saldo target tabungan
+            setSavingsGoals((prev) => {
+              const updated = prev.map((g) =>
+                g.id === goalId
+                  ? { ...g, currentAmount: Math.max(0, g.currentAmount - tx.amount) }
+                  : g
+              );
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('finflo_savings_goals', JSON.stringify(updated));
+              }
+              return updated;
+            });
+          } else if (tx.type === 'income') {
+            // Penarikan dibatalkan: kembalikan saldo ke target tabungan
+            setSavingsGoals((prev) => {
+              const updated = prev.map((g) =>
+                g.id === goalId ? { ...g, currentAmount: g.currentAmount + tx.amount } : g
+              );
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('finflo_savings_goals', JSON.stringify(updated));
+              }
+              return updated;
+            });
+          }
+        }
+
         setTransactions((prev) => prev.filter((t) => t.id !== id));
         apiDeleteTransaction(id);
         showToast('Transaksi berhasil dihapus.', 'info');
@@ -746,6 +797,7 @@ export default function FinFloApp() {
       category: categoryName,
       description: `Setor tabungan: ${targetGoal?.title || 'Target Impian'}`,
       walletId: sourceWalletId,
+      savingsGoalId: goalId,
     };
     setTransactions((prev) => [newTx, ...prev]);
 
@@ -780,6 +832,88 @@ export default function FinFloApp() {
       }
     } catch (e) {
       console.error('Gagal mencatat transaksi setoran ke database:', e);
+    }
+  };
+
+  const handleWithdrawGoal = async (
+    goalId: string,
+    amount: number,
+    destinationWalletId: string
+  ) => {
+    const destWallet = wallets.find((w) => w.id === destinationWalletId);
+    if (!destWallet) return;
+
+    const targetGoal = savingsGoals.find((g) => g.id === goalId);
+    if (!targetGoal) return;
+    if (targetGoal.currentAmount < amount) {
+      showToast('Saldo tabungan tidak mencukupi untuk ditarik.', 'error');
+      return;
+    }
+
+    const tempTxId = 'tx_withdraw_' + Date.now();
+
+    // 1. Pembaruan instan pada antarmuka (optimistic update)
+    setWallets((prev) =>
+      prev.map((w) =>
+        w.id === destinationWalletId ? { ...w, balance: w.balance + amount } : w
+      )
+    );
+
+    setSavingsGoals((prev) => {
+      const updated = prev.map((g) =>
+        g.id === goalId
+          ? { ...g, currentAmount: Math.max(0, g.currentAmount - amount) }
+          : g
+      );
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('finflo_savings_goals', JSON.stringify(updated));
+      }
+      return updated;
+    });
+
+    const newTx: Transaction = {
+      id: tempTxId,
+      amount,
+      type: 'income',
+      date: new Date().toISOString().split('T')[0],
+      category: 'Tarik Tabungan',
+      description: `Tarik tabungan: ${targetGoal.title}`,
+      walletId: destinationWalletId,
+      savingsGoalId: goalId,
+    };
+    setTransactions((prev) => [newTx, ...prev]);
+
+    setWithdrawGoalTarget(null);
+    showToast(`Dana dari target "${targetGoal.title}" berhasil ditarik ke ${destWallet.name}!`, 'success');
+
+    // 2. Sinkronisasi transaksi, saldo dompet, dan target tabungan ke database
+    try {
+      const result = await apiWithdrawSavingsGoal(
+        goalId,
+        amount,
+        destinationWalletId,
+        user?.email || defaultUser.email
+      );
+
+      if (result) {
+        if (result.transaction) {
+          setTransactions((prev) =>
+            prev.map((t) => (t.id === tempTxId ? result.transaction : t))
+          );
+        }
+        if (result.wallet) {
+          setWallets((prev) =>
+            prev.map((w) => (w.id === destinationWalletId ? result.wallet : w))
+          );
+        }
+        if (result.goal) {
+          setSavingsGoals((prev) =>
+            prev.map((g) => (g.id === goalId ? result.goal : g))
+          );
+        }
+      }
+    } catch (e) {
+      console.error('Gagal mencatat transaksi penarikan ke database:', e);
     }
   };
 
@@ -960,6 +1094,7 @@ export default function FinFloApp() {
               }}
               onOpenAddGoal={() => setIsAddGoalOpen(true)}
               onOpenDepositGoal={(goal) => setDepositGoalTarget(goal)}
+              onOpenWithdrawGoal={(goal) => setWithdrawGoalTarget(goal)}
               onDeleteGoal={handleDeleteGoal}
               onEditCategory={(cat) => {
                 setEditingCategory(cat);
@@ -1102,6 +1237,14 @@ export default function FinFloApp() {
         goal={depositGoalTarget}
         wallets={wallets}
         onDeposit={handleDepositGoal}
+      />
+
+      <WithdrawGoalModal
+        isOpen={!!withdrawGoalTarget}
+        onClose={() => setWithdrawGoalTarget(null)}
+        goal={withdrawGoalTarget}
+        wallets={wallets}
+        onWithdraw={handleWithdrawGoal}
       />
 
       <FreeTierModal

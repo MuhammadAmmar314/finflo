@@ -61,6 +61,7 @@ export interface Transaction {
   walletId: string;
   toWalletId?: string;
   targetWalletId?: string;
+  savingsGoalId?: string;
   category: string;
   categoryName?: string;
   categoryId?: string;

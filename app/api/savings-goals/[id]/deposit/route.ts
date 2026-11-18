@@ -90,6 +90,7 @@ export async function POST(
           category: categoryName,
           description: `Setor tabungan: ${goal.title}`,
           walletId,
+          savingsGoalId: goal.id,
           userId: user.id,
         },
       });

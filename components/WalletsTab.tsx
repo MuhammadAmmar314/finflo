@@ -18,6 +18,7 @@ import {
   Target,
   Sliders,
   RotateCcw,
+  ArrowDownLeft,
 } from 'lucide-react';
 import { Wallet, ExpenseCategory, User, SavingsGoal } from '@/lib/types';
 import { formatIDR } from '@/lib/utils';
@@ -31,6 +32,7 @@ interface WalletsTabProps {
   onOpenAddCategory: () => void;
   onOpenAddGoal?: () => void;
   onOpenDepositGoal?: (goal: SavingsGoal) => void;
+  onOpenWithdrawGoal?: (goal: SavingsGoal) => void;
   onDeleteGoal?: (id: string) => void;
   onEditCategory: (category: ExpenseCategory) => void;
   onApply6Pillars: () => void;
@@ -48,6 +50,7 @@ export const WalletsTab: React.FC<WalletsTabProps> = ({
   onOpenAddCategory,
   onOpenAddGoal,
   onOpenDepositGoal,
+  onOpenWithdrawGoal,
   onDeleteGoal,
   onEditCategory,
   onApply6Pillars,
@@ -339,19 +342,34 @@ export const WalletsTab: React.FC<WalletsTabProps> = ({
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1.5 flex-wrap">
                     <span className="text-[10px] text-slate-400">
                       {goal.targetDate ? `Target: ${goal.targetDate}` : 'Fleksibel'}
                     </span>
-                    {onOpenDepositGoal && (
-                      <button
-                        onClick={() => onOpenDepositGoal(goal)}
-                        className="flex items-center gap-1.5 rounded-xl bg-slate-100 hover:bg-teal-50 hover:text-teal-700 px-3 py-1.5 text-xs font-bold text-slate-700 transition dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-teal-950 dark:hover:text-teal-300 active:scale-95"
-                      >
-                        <PiggyBank className="h-3.5 w-3.5 text-teal-600 dark:text-teal-400" />
-                        <span>Setor Tabungan</span>
-                      </button>
-                    )}
+                    <div className="flex items-center gap-1.5">
+                      {onOpenWithdrawGoal && (
+                        <button
+                          type="button"
+                          onClick={() => onOpenWithdrawGoal(goal)}
+                          disabled={goal.currentAmount <= 0}
+                          title={goal.currentAmount <= 0 ? 'Belum ada saldo untuk ditarik' : 'Tarik dana dari target'}
+                          className="flex items-center gap-1 rounded-xl bg-slate-100 hover:bg-amber-50 hover:text-amber-700 px-2.5 py-1.5 text-xs font-bold text-slate-700 transition dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-amber-950 dark:hover:text-amber-300 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
+                        >
+                          <ArrowDownLeft className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                          <span>Tarik</span>
+                        </button>
+                      )}
+                      {onOpenDepositGoal && (
+                        <button
+                          type="button"
+                          onClick={() => onOpenDepositGoal(goal)}
+                          className="flex items-center gap-1 rounded-xl bg-slate-100 hover:bg-teal-50 hover:text-teal-700 px-2.5 py-1.5 text-xs font-bold text-slate-700 transition dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-teal-950 dark:hover:text-teal-300 active:scale-95"
+                        >
+                          <PiggyBank className="h-3.5 w-3.5 text-teal-600 dark:text-teal-400" />
+                          <span>Setor</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
