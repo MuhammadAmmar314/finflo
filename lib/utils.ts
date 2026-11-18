@@ -1,4 +1,4 @@
-import { Transaction, Wallet, ExpenseCategory } from './types';
+import { Transaction, Wallet, ExpenseCategory, SavingsGoal } from './types';
 
 export interface StatsSummary {
   totalBalance: number;
@@ -120,29 +120,73 @@ export interface CategoryBudgetAudit {
 export function calculateFinancialHealth(
   transactions: Transaction[],
   wallets: Wallet[],
-  expenseCategories: ExpenseCategory[] = []
+  expenseCategories: ExpenseCategory[] = [],
+  savingsGoals: SavingsGoal[] = []
 ) {
   const stats = calculateStats(transactions, wallets);
   const hasData = transactions.length > 0 && (stats.totalIncome > 0 || stats.totalExpense > 0);
 
   const currentMonth = new Date().toISOString().slice(0, 7);
-
-  const income = stats.totalIncome || 1;
   const expense = stats.totalExpense;
-  const netSavings = Math.max(0, stats.totalIncome - stats.totalExpense);
-  const savingsRate = stats.totalIncome > 0 ? Math.round((netSavings / stats.totalIncome) * 100) : 0;
+
+  const isSavingsCategory = (name: string) => {
+    const lower = name.toLowerCase();
+    return (
+      lower.includes('nabung') ||
+      lower.includes('investasi') ||
+      lower.includes('tabung')
+    );
+  };
+
+  const isCategoryMatch = (txCat: string, catName: string) => {
+    if (!txCat || !catName) return false;
+    if (txCat.toLowerCase().trim() === catName.toLowerCase().trim()) return true;
+
+    const norm = (s: string) =>
+      s
+        .toLowerCase()
+        .replace(/tabungan/g, 'nabung')
+        .replace(/simpanan/g, 'nabung')
+        .replace(/[\/&]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const nTx = norm(txCat);
+    const nCat = norm(catName);
+
+    if (nTx === nCat) return true;
+
+    if (isSavingsCategory(catName) && isSavingsCategory(txCat)) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const currentMonthTransactions = transactions.filter((tx) =>
+    tx.date ? tx.date.startsWith(currentMonth) : true
+  );
 
   // Compute category audits from user's actual categories
   const categoryAudits: CategoryBudgetAudit[] = expenseCategories
     .filter((c) => (c.budgetPercentage || 0) > 0)
     .map((c) => {
-      const spent = transactions
-        .filter((tx) => tx.type === 'expense' && tx.category === c.name)
+      const transactionSpent = currentMonthTransactions
+        .filter((tx) => tx.type === 'expense' && isCategoryMatch(tx.category, c.name))
         .reduce((sum, tx) => sum + tx.amount, 0);
 
-      const realRate = stats.totalIncome > 0
-        ? Math.round((spent / stats.totalIncome) * 100)
-        : (stats.totalExpense > 0 ? Math.round((spent / stats.totalExpense) * 100) : 0);
+      const goalsAmount = isSavingsCategory(c.name)
+        ? (savingsGoals || []).reduce((sum, g) => sum + (g.currentAmount || 0), 0)
+        : 0;
+
+      const spent = Math.max(transactionSpent, goalsAmount);
+
+      const realRate =
+        stats.totalIncome > 0
+          ? Math.round((spent / stats.totalIncome) * 100)
+          : stats.totalExpense > 0
+          ? Math.round((spent / stats.totalExpense) * 100)
+          : 0;
 
       const targetRate = c.budgetPercentage;
       const budgetNominal = stats.totalIncome > 0 ? (targetRate / 100) * stats.totalIncome : 0;
@@ -169,6 +213,14 @@ export function calculateFinancialHealth(
         statusNote,
       };
     });
+
+  const netSavings = Math.max(0, stats.totalIncome - stats.totalExpense);
+  const totalSavingsAllocated = categoryAudits
+    .filter((ca) => isSavingsCategory(ca.name))
+    .reduce((sum, ca) => sum + ca.spent, 0);
+
+  const effectiveSavings = Math.max(netSavings, totalSavingsAllocated);
+  const savingsRate = stats.totalIncome > 0 ? Math.round((effectiveSavings / stats.totalIncome) * 100) : 0;
 
   if (!hasData) {
     return {

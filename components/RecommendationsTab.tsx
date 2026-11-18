@@ -16,7 +16,7 @@ import {
   Zap,
   Sliders,
 } from 'lucide-react';
-import { User, Transaction, Wallet, Debt, ExpenseCategory, TabType } from '@/lib/types';
+import { User, Transaction, Wallet, Debt, ExpenseCategory, TabType, SavingsGoal } from '@/lib/types';
 import { formatIDR, calculateFinancialHealth } from '@/lib/utils';
 
 interface RecommendationsTabProps {
@@ -25,6 +25,7 @@ interface RecommendationsTabProps {
   wallets: Wallet[];
   debts: Debt[];
   expenseCategories?: ExpenseCategory[];
+  savingsGoals?: SavingsGoal[];
   onOpenUpgrade: () => void;
   onTabChange?: (tab: TabType) => void;
 }
@@ -35,11 +36,12 @@ export const RecommendationsTab: React.FC<RecommendationsTabProps> = ({
   wallets,
   debts,
   expenseCategories = [],
+  savingsGoals = [],
   onOpenUpgrade,
   onTabChange,
 }) => {
   const isPro = user.plan === 'pro';
-  const health = calculateFinancialHealth(transactions, wallets, expenseCategories);
+  const health = calculateFinancialHealth(transactions, wallets, expenseCategories, savingsGoals);
 
   // Goal simulator state
   const [goalName, setGoalName] = useState('Dana Darurat 6 Bulan');
@@ -379,6 +381,31 @@ export const RecommendationsTab: React.FC<RecommendationsTabProps> = ({
           <p className="text-xs text-slate-500">
             Kalkulasikan kemampuan arus kas Anda untuk mencapai target tabungan dalam durasi waktu tertentu
           </p>
+
+          {savingsGoals.length > 0 && (
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-[11px] font-semibold text-slate-500">Pilih dari Target Impian Anda:</span>
+              <div className="flex flex-wrap gap-1.5">
+                {savingsGoals.map((g) => (
+                  <button
+                    key={g.id}
+                    type="button"
+                    onClick={() => {
+                      setGoalName(g.title);
+                      setGoalTargetAmount(g.targetAmount);
+                    }}
+                    className={`rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition cursor-pointer ${
+                      goalName === g.title
+                        ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300'
+                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                    }`}
+                  >
+                    {g.title} ({formatIDR(g.targetAmount)})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">

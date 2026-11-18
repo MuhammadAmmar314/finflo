@@ -69,7 +69,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
 }) => {
   const isPro = user.plan === 'pro';
   const stats = calculateStats(transactions, wallets);
-  const health = calculateFinancialHealth(transactions, wallets);
+  const health = calculateFinancialHealth(transactions, wallets, expenseCategories, savingsGoals);
 
   const barCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const doughnutCanvasRef = useRef<HTMLCanvasElement | null>(null);

@@ -955,6 +955,7 @@ export default function FinFloApp() {
               wallets={wallets}
               debts={debts}
               expenseCategories={expenseCategories}
+              savingsGoals={savingsGoals}
               onTabChange={setActiveTab}
               onOpenUpgrade={() =>
                 triggerFreeTierLimit(
