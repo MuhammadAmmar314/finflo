@@ -71,9 +71,10 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ success: true, data: newGoal });
-  } catch (error) {
+  } catch (error: any) {
+    console.error('API Error in POST /api/savings-goals:', error?.message || error);
     return NextResponse.json(
-      { success: false, error: 'Gagal membuat target tabungan' },
+      { success: false, error: 'Gagal membuat target tabungan', details: error?.message || String(error) },
       { status: 500 }
     );
   }

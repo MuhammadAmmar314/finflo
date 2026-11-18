@@ -187,7 +187,28 @@ export default function FinFloApp() {
         );
         setTransactions(remoteData.transactions);
         setDebts(remoteData.debts);
-        setSavingsGoals(remoteData.savingsGoals);
+        if (remoteData.savingsGoals && remoteData.savingsGoals.length > 0) {
+          setSavingsGoals(remoteData.savingsGoals);
+        } else {
+          setSavingsGoals((currentGoals) => {
+            if (currentGoals && currentGoals.length > 0) {
+              currentGoals.forEach((goal) => {
+                if (goal.id.startsWith('goal_')) {
+                  const { id: _tempId, ...goalData } = goal;
+                  apiAddSavingsGoal(goalData, user.email).then((saved) => {
+                    if (saved?.id) {
+                      setSavingsGoals((prev) =>
+                        prev.map((g) => (g.id === goal.id ? saved : g))
+                      );
+                    }
+                  });
+                }
+              });
+              return currentGoals;
+            }
+            return remoteData.savingsGoals;
+          });
+        }
       }
     });
   }, [user?.email, hasMounted]);
@@ -642,13 +663,21 @@ export default function FinFloApp() {
     });
     setIsAddGoalOpen(false);
 
-    apiAddSavingsGoal(goalData, user?.email || defaultUser.email).then((savedGoal) => {
-      if (savedGoal?.id) {
-        setSavingsGoals((prev) =>
-          prev.map((g) => (g.id === tempId ? savedGoal : g))
-        );
-      }
-    });
+    apiAddSavingsGoal(goalData, user?.email || defaultUser.email)
+      .then((savedGoal) => {
+        if (savedGoal?.id) {
+          setSavingsGoals((prev) => {
+            const mapped = prev.map((g) => (g.id === tempId ? savedGoal : g));
+            if (typeof window !== 'undefined') {
+              localStorage.setItem('finflo_savings_goals', JSON.stringify(mapped));
+            }
+            return mapped;
+          });
+        }
+      })
+      .catch((err) => {
+        console.error('Error persisting savings goal:', err);
+      });
 
     showToast('Target impian berhasil ditambahkan!', 'success');
   };
