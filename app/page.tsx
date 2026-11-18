@@ -176,11 +176,18 @@ export default function FinFloApp() {
 
     fetchUserData(user.email).then((remoteData) => {
       if (remoteData) {
-        if (remoteData.wallets.length > 0) setWallets(remoteData.wallets);
-        if (remoteData.expenseCategories.length > 0) setExpenseCategories(remoteData.expenseCategories);
-        if (remoteData.transactions.length > 0) setTransactions(remoteData.transactions);
-        if (remoteData.debts.length > 0) setDebts(remoteData.debts);
-        if (remoteData.savingsGoals.length > 0) setSavingsGoals(remoteData.savingsGoals);
+        if (remoteData.user) {
+          setUser((prev) => (prev ? { ...prev, ...remoteData.user } : remoteData.user));
+        }
+        setWallets(remoteData.wallets);
+        setExpenseCategories(
+          remoteData.expenseCategories.length > 0
+            ? remoteData.expenseCategories
+            : defaultExpenseCategories
+        );
+        setTransactions(remoteData.transactions);
+        setDebts(remoteData.debts);
+        setSavingsGoals(remoteData.savingsGoals);
       }
     });
   }, [user?.email, hasMounted]);
@@ -543,7 +550,7 @@ export default function FinFloApp() {
     showToast(`Tagihan "${newDebt.title}" berhasil dicatat!`, 'success');
   };
 
-  const handleConfirmPayDebt = (
+  const handleConfirmPayDebt = async (
     debtId: string,
     amount: number,
     walletId: string,
@@ -556,8 +563,9 @@ export default function FinFloApp() {
       prev.map((w) => (w.id === walletId ? { ...w, balance: w.balance - amount } : w))
     );
 
+    const tempTxId = `tx_pay_${Date.now()}`;
     const newTx: Transaction = {
-      id: `tx_pay_${Date.now()}`,
+      id: tempTxId,
       type: 'expense',
       amount: amount,
       walletId,
@@ -581,8 +589,25 @@ export default function FinFloApp() {
       })
     );
 
-    apiPayDebt(debtId, amount, walletId, isFullPayment, user?.email || defaultUser.email);
     showToast(`Pembayaran Rp ${amount.toLocaleString('id-ID')} berhasil dicatat!`, 'success');
+
+    try {
+      const res = await apiPayDebt(debtId, amount, walletId, isFullPayment, user?.email || defaultUser.email);
+      if (res) {
+        if (res.transaction) {
+          setTransactions((prev) =>
+            prev.map((t) => (t.id === tempTxId ? res.transaction : t))
+          );
+        }
+        if (res.debt) {
+          setDebts((prev) =>
+            prev.map((d) => (d.id === debtId ? res.debt : d))
+          );
+        }
+      }
+    } catch (e) {
+      console.error('Gagal mencatat pembayaran hutang ke database:', e);
+    }
   };
 
   const handleDeleteDebt = (id: string) => {

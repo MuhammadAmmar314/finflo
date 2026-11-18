@@ -52,6 +52,9 @@ export async function POST(request: NextRequest) {
         debts: {
           orderBy: { dueDate: 'asc' },
         },
+        savingsGoals: {
+          orderBy: { createdAt: 'desc' },
+        },
       },
     });
 

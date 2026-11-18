@@ -6,6 +6,7 @@ import {
   defaultIncomeCategories,
   defaultTransactions,
   defaultDebts,
+  defaultSavingsGoals,
 } from '../lib/defaultData';
 
 const prisma = new PrismaClient();
@@ -138,6 +139,30 @@ async function main() {
         dueDate: debt.dueDate,
         status: debt.status,
         notes: debt.notes,
+        userId: user.id,
+      },
+    });
+  }
+
+  for (const goal of defaultSavingsGoals) {
+    await prisma.savingsGoal.upsert({
+      where: { id: goal.id },
+      update: {
+        title: goal.title,
+        targetAmount: goal.targetAmount,
+        currentAmount: goal.currentAmount,
+        targetDate: goal.targetDate || null,
+        category: goal.category,
+        color: goal.color,
+      },
+      create: {
+        id: goal.id,
+        title: goal.title,
+        targetAmount: goal.targetAmount,
+        currentAmount: goal.currentAmount,
+        targetDate: goal.targetDate || null,
+        category: goal.category,
+        color: goal.color,
         userId: user.id,
       },
     });

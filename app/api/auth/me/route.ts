@@ -15,7 +15,6 @@ export async function GET(request: NextRequest) {
         incomeCategories: true,
         transactions: {
           orderBy: { date: 'desc' },
-          take: 50,
         },
         debts: {
           orderBy: { dueDate: 'asc' },

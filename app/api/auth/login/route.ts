@@ -30,6 +30,9 @@ export async function POST(request: NextRequest) {
         debts: {
           orderBy: { dueDate: 'asc' },
         },
+        savingsGoals: {
+          orderBy: { createdAt: 'desc' },
+        },
       },
     });
 
@@ -67,6 +70,7 @@ export async function POST(request: NextRequest) {
             incomeCategories: true,
             transactions: true,
             debts: true,
+            savingsGoals: true,
           },
         });
       } else {
