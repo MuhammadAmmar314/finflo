@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinFlo - Your Smart Financial Flow | Financial Planner</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/logo-icon.svg">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+              950: '#082f49',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & Custom CSS -->
+  <link rel="stylesheet" href="css/custom.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+</head>
+
+<body class="bg-[#f8fafc] dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen antialiased selection:bg-brand-500 selection:text-white transition-colors duration-200">
+
+  <!-- ============================================================== -->
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <!-- ============================================================== -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none max-w-sm w-full px-4"></div>
+
+  <!-- ============================================================== -->
+  <!-- VIEW 1: AUTHENTICATION / LOGIN PAGE -->
+  <!-- ============================================================== -->
+  <div id="view-login" class="min-h-screen flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-gradient-to-br from-slate-50 via-sky-50/40 to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <!-- Decorative Ambient Lights -->
+    <div class="absolute top-[-10%] left-[-10%] w-[45vw] h-[45vw] rounded-full bg-brand-400/15 dark:bg-brand-600/10 blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full bg-emerald-400/15 dark:bg-emerald-600/10 blur-3xl pointer-events-none"></div>
+
+    <!-- Login Container -->
+    <div class="max-w-md w-full space-y-8 relative z-10">
+      
+      <!-- Logo Branding Header -->
+      <div class="text-center">
+        <div class="inline-flex items-center justify-center p-3 rounded-2xl bg-white dark:bg-slate-800 shadow-md border border-slate-200/60 dark:border-slate-700/60 mb-3">
+          <img src="assets/logo-icon.svg" alt="FinFlo Logo" class="w-12 h-12">
+        </div>
+        <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          Fin<span class="text-brand-600 dark:text-brand-400">Flo</span>
+        </h1>
+        <p class="mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
+          Your Smart Financial Flow
+        </p>
+        <div class="mt-2 inline-flex items-center space-x-1 px-3 py-1 rounded-full bg-brand-50 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300 text-xs font-semibold border border-brand-200 dark:border-brand-800">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span>Financial Planner Modern & Interaktif</span>
+        </div>
+      </div>
+
+      <!-- Auth Card -->
+      <div class="glass-card rounded-3xl p-8 shadow-xl shadow-slate-200/50 dark:shadow-black/40 border border-slate-200 dark:border-slate-800">
+        
+        <!-- Google Sign-In Button (Prominent) -->
+        <button type="button" onclick="FinFloApp.openGoogleModal()" class="w-full flex items-center justify-center py-3 px-4 border border-slate-300 dark:border-slate-700 rounded-2xl shadow-xs bg-white dark:bg-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 hover:border-slate-400 dark:hover:border-slate-600 transition-all duration-200 group">
+          <svg class="w-5 h-5 mr-3 shrink-0" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Sign in with Google</span>
+        </button>
+
+        <!-- Divider -->
+        <div class="relative my-6">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-slate-200 dark:border-slate-700"></div>
+          </div>
+          <div class="relative flex justify-center text-xs uppercase tracking-wider">
+            <span class="bg-white dark:bg-slate-900 px-3 text-slate-400 dark:text-slate-500 font-semibold">atau dengan email</span>
+          </div>
+        </div>
+
+        <!-- Email & Password Form -->
+        <form id="login-form" onsubmit="FinFloApp.handleEmailLogin(event); return false;" class="space-y-4">
+          <div>
+            <label for="login-email" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1.5">
+              Email Pengguna
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i data-lucide="mail" class="w-4 h-4"></i>
+              </div>
+              <input id="login-email" type="email" required placeholder="budi.pratama@gmail.com" value="budi.pratama@gmail.com" class="block w-full pl-10 pr-3 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors">
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="login-password" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                Kata Sandi
+              </label>
+              <a href="javascript:void(0)" onclick="FinFloApp.showToast('Gunakan tombol Demo untuk langsung mencoba!', 'info')" class="text-xs text-brand-600 dark:text-brand-400 hover:underline">
+                Lupa sandi?
+              </a>
+            </div>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <i data-lucide="lock" class="w-4 h-4"></i>
+              </div>
+              <input id="login-password" type="password" required value="finflo2026" placeholder="••••••••" class="block w-full pl-10 pr-3 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors">
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="w-full mt-2 flex justify-center py-3 px-4 border border-transparent rounded-2xl shadow-md text-sm font-bold text-white bg-gradient-to-r from-brand-600 to-teal-500 hover:from-brand-700 hover:to-teal-600 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all transform active:scale-[0.99]">
+            Masuk ke Dashboard FinFlo
+          </button>
+        </form>
+
+        <!-- Quick 1-Click Demo Login -->
+        <div class="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800/80 text-center">
+          <button type="button" onclick="FinFloApp.quickDemoLogin()" class="w-full flex items-center justify-center space-x-2 py-2.5 px-4 rounded-xl text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-all">
+            <i data-lucide="zap" class="w-4 h-4 text-emerald-600"></i>
+            <span>Akses Cepat 1-Klik sebagai Budi Pratama (Demo)</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Free Tier Highlights Badge -->
+      <div class="p-4 rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 text-center">
+        <p class="text-xs font-semibold text-slate-600 dark:text-slate-400">
+          <span class="inline-block w-2 h-2 rounded-full bg-brand-500 mr-1.5"></span>
+          Paket Free Tier: 3 Dompet Utama, 5 Kategori Pengeluaran & Pencatatan Tanpa Batas.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- VIEW 2: MAIN DASHBOARD SPA (AFTER LOGIN) -->
+  <!-- ============================================================== -->
+  <div id="view-app" class="hidden min-h-screen flex flex-col lg:flex-row">
+    
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="hidden lg:flex lg:flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 p-5 shrink-0 select-none">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-3 px-2 mb-8 cursor-pointer" onclick="FinFloApp.switchTab('dashboard')">
+        <img src="assets/logo-icon.svg" alt="FinFlo Logo" class="w-9 h-9">
+        <div>
+          <span class="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">Fin<span class="text-brand-600 dark:text-brand-400">Flo</span></span>
+          <p class="text-[10px] font-semibold text-slate-400 tracking-wider uppercase">Smart Flow</p>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="space-y-1.5 flex-1">
+        <button id="nav-btn-dashboard" onclick="FinFloApp.switchTab('dashboard')" class="flex items-center w-full px-4 py-3 text-sm font-semibold text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950/40 rounded-xl transition-all">
+          <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3 shrink-0"></i>
+          <span>Dashboard</span>
+        </button>
+
+        <button id="nav-btn-transactions" onclick="FinFloApp.switchTab('transactions')" class="flex items-center w-full px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800/50 rounded-xl transition-all">
+          <i data-lucide="arrow-left-right" class="w-5 h-5 mr-3 shrink-0"></i>
+          <span>Transaksi</span>
+        </button>
+
+        <button id="nav-btn-debts" onclick="FinFloApp.switchTab('debts')" class="flex items-center justify-between w-full px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800/50 rounded-xl transition-all">
+          <div class="flex items-center">
+            <i data-lucide="badge-percent" class="w-5 h-5 mr-3 shrink-0"></i>
+            <span>Hutang & Paylater</span>
+          </div>
+          <span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">PRO</span>
+        </button>
+
+        <button id="nav-btn-recommendations" onclick="FinFloApp.switchTab('recommendations')" class="flex items-center justify-between w-full px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800/50 rounded-xl transition-all">
+          <div class="flex items-center">
+            <i data-lucide="sparkles" class="w-5 h-5 mr-3 shrink-0 text-amber-500"></i>
+            <span>Rekomendasi AI</span>
+          </div>
+          <span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs">PRO</span>
+        </button>
+
+        <button id="nav-btn-wallets" onclick="FinFloApp.switchTab('wallets')" class="flex items-center w-full px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800/50 rounded-xl transition-all">
+          <i data-lucide="wallet" class="w-5 h-5 mr-3 shrink-0"></i>
+          <span>Dompet & Kategori</span>
+        </button>
+
+        <button id="nav-btn-profile" onclick="FinFloApp.switchTab('profile')" class="flex items-center w-full px-4 py-3 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100/70 dark:hover:bg-slate-800/50 rounded-xl transition-all">
+          <i data-lucide="user" class="w-5 h-5 mr-3 shrink-0"></i>
+          <span>Profil / Akun</span>
+        </button>
+      </nav>
+
+      <!-- Free Tier Card Teaser -->
+      <div class="p-4 rounded-2xl bg-gradient-to-br from-brand-50 to-teal-50 dark:from-slate-800/80 dark:to-slate-800 border border-brand-100 dark:border-slate-700/80 mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-brand-800 dark:text-brand-300">Free Tier Active</span>
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-brand-200/70 dark:bg-brand-900 text-brand-800 dark:text-brand-200 font-bold">Standard</span>
+        </div>
+        <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
+          Maksimal 3 dompet & 5 kategori pengeluaran dasar.
+        </p>
+        <button onclick="FinFloApp.openFreeTierModal('quota')" class="w-full py-1.5 px-3 rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold transition-colors shadow-xs">
+          Lihat Batasan Kuota
+        </button>
+      </div>
+
+      <!-- Quick Logout in Sidebar -->
+      <button onclick="FinFloApp.logout()" class="flex items-center w-full px-4 py-2.5 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-all">
+        <i data-lucide="log-out" class="w-4 h-4 mr-2.5"></i>
+        <span>Keluar dari Sesi</span>
+      </button>
+
+    </aside>
+
+    <!-- MAIN BODY AREA -->
+    <div class="flex-1 flex flex-col min-w-0 pb-20 lg:pb-8">
+
+      <!-- TOP NAVBAR -->
+      <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 px-4 sm:px-8 py-3.5 flex items-center justify-between">
+        
+        <!-- Left: Greetings & Tier Pill (matches mockup "Welcome, Budi! Free Tier") -->
+        <div class="flex items-center space-x-3">
+          <!-- Mobile Brand Logo -->
+          <div class="lg:hidden flex items-center mr-2">
+            <img src="assets/logo-icon.svg" alt="FinFlo" class="w-8 h-8">
+          </div>
+
+          <div>
+            <div class="flex items-center space-x-2.5">
+              <h2 id="header-greeting" class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                Welcome, Budi!
+              </h2>
+              <span id="header-tier-pill"></span>
+            </div>
+            <p class="text-xs text-slate-400 dark:text-slate-500 hidden sm:block">
+              Pantau arus keuangan cerdas Anda hari ini
+            </p>
+          </div>
+        </div>
+
+        <!-- Right: Actions, Theme Toggle, Profile Avatar -->
+        <div class="flex items-center space-x-2 sm:space-x-3">
+          
+          <!-- Quick Add Transaction Primary Button -->
+          <button onclick="FinFloApp.openTransactionModal('expense')" class="hidden sm:inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-gradient-to-r from-brand-600 to-teal-500 hover:from-brand-700 hover:to-teal-600 shadow-sm shadow-brand-500/25 transition-all active:scale-95">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>Tambah Transaksi</span>
+          </button>
+
+          <!-- Dark Mode Toggle -->
+          <button onclick="FinFloApp.toggleTheme()" title="Toggle Dark/Light Mode" class="p-2 rounded-xl text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+            <i data-lucide="moon" class="w-5 h-5 dark:hidden"></i>
+            <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+          </button>
+
+          <!-- Quick Logout Button -->
+          <button onclick="FinFloApp.logout()" title="Keluar / Ganti Akun" class="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+          </button>
+
+          <!-- User Avatar & Mini Profile Dropdown Click -->
+          <div class="flex items-center space-x-2 pl-2 border-l border-slate-200 dark:border-slate-800 cursor-pointer" onclick="FinFloApp.switchTab('profile')">
+            <img id="header-user-avatar" src="" alt="Avatar" class="w-9 h-9 rounded-full ring-2 ring-brand-500/30 object-cover">
+            <div class="hidden md:block text-left text-xs">
+              <p id="header-user-name" class="font-bold text-slate-800 dark:text-slate-200 leading-tight">Budi Pratama</p>
+              <p id="header-user-email" class="text-slate-400 text-[11px] leading-tight">budi.pratama@gmail.com</p>
+            </div>
+          </div>
+
+        </div>
+      </header>
+
+      <!-- TAB CONTENT PAGES -->
+      <main class="flex-1 px-4 sm:px-8 py-6">
+
+        <!-- ============================================================== -->
+        <!-- TAB 1: DASHBOARD VIEW (Direct Match with Mockup) -->
+        <!-- ============================================================== -->
+        <div id="tab-content-dashboard" class="space-y-6">
+
+          <!-- Debt / Paylater Due Alert Banner -->
+          <div id="dash-debt-alert-banner" class="hidden"></div>
+
+          <!-- TOP 3 STATS CARDS (Total Saldo, Pemasukan Bulan Ini, Pengeluaran Bulan Ini) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            
+            <!-- Card 1: Total Saldo -->
+            <div class="glass-card rounded-2xl p-5 shadow-xs card-hover relative overflow-hidden border border-slate-200/80 dark:border-slate-800">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Saldo</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-sky-100 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300">
+                  <i data-lucide="trending-up" class="w-3.5 h-3.5 mr-1"></i> +8.4%
+                </span>
+              </div>
+              <div class="mt-2">
+                <h3 id="stat-total-saldo" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-mono-num tracking-tight">
+                  Rp 15.250.000
+                </h3>
+              </div>
+              <!-- Mini Sparkline Wave (Cyan/Sky) -->
+              <div class="mt-4 pt-1 flex items-center justify-between text-xs text-slate-400">
+                <span>3 Dompet Aktif</span>
+                <svg class="w-24 h-7 text-sky-500" viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                  <path d="M 5 22 Q 25 25, 45 15 T 75 10 T 95 6" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Card 2: Pemasukan Bulan Ini -->
+            <div class="glass-card rounded-2xl p-5 shadow-xs card-hover relative overflow-hidden border border-slate-200/80 dark:border-slate-800">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Pemasukan Bulan Ini</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
+                  <i data-lucide="arrow-down-left" class="w-3.5 h-3.5 mr-1"></i> +12.5%
+                </span>
+              </div>
+              <div class="mt-2">
+                <h3 id="stat-pemasukan" class="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono-num tracking-tight">
+                  Rp 9.800.000
+                </h3>
+              </div>
+              <!-- Mini Sparkline Wave (Emerald) -->
+              <div class="mt-4 pt-1 flex items-center justify-between text-xs text-slate-400">
+                <span>Arus Kas Masuk</span>
+                <svg class="w-24 h-7 text-emerald-500" viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                  <path d="M 5 24 Q 30 18, 55 12 T 80 8 T 95 4" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Card 3: Pengeluaran Bulan Ini -->
+            <div class="glass-card rounded-2xl p-5 shadow-xs card-hover relative overflow-hidden border border-slate-200/80 dark:border-slate-800">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Pengeluaran Bulan Ini</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300">
+                  <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 mr-1"></i> -3.2%
+                </span>
+              </div>
+              <div class="mt-2">
+                <h3 id="stat-pengeluaran" class="text-2xl sm:text-3xl font-extrabold text-rose-600 dark:text-rose-400 font-mono-num tracking-tight">
+                  Rp 4.550.000
+                </h3>
+              </div>
+              <!-- Mini Sparkline Wave (Rose) -->
+              <div class="mt-4 pt-1 flex items-center justify-between text-xs text-slate-400">
+                <span>Arus Pengeluaran</span>
+                <svg class="w-24 h-7 text-rose-500" viewBox="0 0 100 30" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                  <path d="M 5 10 Q 30 20, 55 18 T 80 22 T 95 26" />
+                </svg>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- PRO RECOMMENDATION SPOTLIGHT BANNER ON DASHBOARD -->
+          <div id="dash-advisor-banner" class="glass-card rounded-2xl p-4 sm:p-5 border border-amber-300/40 dark:border-amber-500/20 bg-gradient-to-r from-amber-50/70 via-sky-50/50 to-teal-50/70 dark:from-amber-950/20 dark:via-sky-950/20 dark:to-teal-950/20 shadow-xs flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"></div>
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- LEFT COLUMN (8 of 12 cols on desktop) -->
+            <div class="lg:col-span-8 space-y-6">
+              
+              <!-- Cashflow Bar Chart Section -->
+              <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800">
+                <div class="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Arus Kas (Cashflow Trend)</h3>
+                    <p class="text-xs text-slate-400">Perbandingan pemasukan vs pengeluaran</p>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span class="inline-flex items-center text-xs font-semibold text-emerald-600 dark:text-emerald-400 mr-2">
+                      <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1.5"></span> Pemasukan
+                    </span>
+                    <span class="inline-flex items-center text-xs font-semibold text-rose-600 dark:text-rose-400">
+                      <span class="w-2.5 h-2.5 rounded-full bg-rose-500 mr-1.5"></span> Pengeluaran
+                    </span>
+                  </div>
+                </div>
+                <!-- Chart Canvas Container -->
+                <div class="h-56 w-full">
+                  <canvas id="chart-cashflow"></canvas>
+                </div>
+              </div>
+
+              <!-- Recent Transactions Card (Matches Mockup Table Exactly) -->
+              <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800">
+                <div class="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Recent Transactions</h3>
+                    <p class="text-xs text-slate-400">Catatan aktivitas keuangan terbaru</p>
+                  </div>
+                  <button onclick="FinFloApp.switchTab('transactions')" class="text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline flex items-center">
+                    <span>Lihat Semua</span>
+                    <i data-lucide="chevron-right" class="w-3.5 h-3.5 ml-0.5"></i>
+                  </button>
+                </div>
+
+                <!-- Recent Transactions Container -->
+                <div id="dash-recent-transactions" class="divide-y divide-slate-100 dark:divide-slate-800"></div>
+              </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN (4 of 12 cols on desktop) (Matches Mockup Right Column!) -->
+            <div class="lg:col-span-4 space-y-6">
+
+              <!-- 1. Ringkasan Dompet Card -->
+              <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center space-x-1.5">
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Ringkasan Dompet</h3>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400 cursor-pointer" onclick="FinFloApp.switchTab('wallets')"></i>
+                  </div>
+                  <span id="dash-wallet-quota-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                    max 3
+                  </span>
+                </div>
+
+                <!-- Wallets List -->
+                <div id="dash-wallets-list" class="space-y-1"></div>
+
+                <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+                  <button onclick="FinFloApp.handleAddNewWallet()" class="w-full flex items-center justify-center space-x-1 py-2 text-xs font-bold text-brand-600 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950/40 rounded-xl transition-colors">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Tambah Dompet</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 2. Kategori Terbatas Card (5 default categories) -->
+              <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800">
+                <div class="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Kategori Terbatas</h3>
+                    <p class="text-[11px] text-slate-400">5 default categories (Free Tier)</p>
+                  </div>
+                  <span id="dash-category-quota-badge" class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                    5
+                  </span>
+                </div>
+
+                <!-- Categories List -->
+                <div id="dash-categories-list" class="space-y-2"></div>
+
+                <!-- Category Doughnut Breakdown Chart -->
+                <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+                  <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Proporsi Pengeluaran</p>
+                  <div class="h-36 w-full">
+                    <canvas id="chart-category-doughnut"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Primary CTA Button (Matches "Tambah Transaksi (+)" in mockup!) -->
+              <div class="pt-1">
+                <button onclick="FinFloApp.openTransactionModal('expense')" class="w-full flex items-center justify-center space-x-2 py-3.5 px-4 rounded-2xl text-sm font-bold text-white bg-gradient-to-r from-teal-500 via-sky-500 to-brand-600 hover:from-teal-600 hover:to-brand-700 shadow-md shadow-brand-500/25 transition-all transform active:scale-[0.98]">
+                  <span>Tambah Transaksi</span>
+                  <div class="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                  </div>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 2: TRANSAKSI VIEW (Full Table & Filters) -->
+        <!-- ============================================================== -->
+        <div id="tab-content-transactions" class="hidden space-y-6">
+
+          <!-- Header & Controls -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 class="text-xl font-extrabold text-slate-900 dark:text-white">Riwayat Transaksi</h2>
+              <p class="text-xs text-slate-400">Kelola dan telusuri seluruh catatan transaksi keuangan Anda</p>
+            </div>
+            
+            <div class="flex items-center space-x-2">
+              <button onclick="FinFloApp.exportToCSV()" class="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors">
+                <i data-lucide="download" class="w-4 h-4"></i>
+                <span>Ekspor CSV</span>
+              </button>
+              <button onclick="FinFloApp.openTransactionModal('expense')" class="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors shadow-xs">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Tambah Transaksi</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter Toolbar Card -->
+          <div class="glass-card rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800 space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              
+              <!-- Search Input -->
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <i data-lucide="search" class="w-4 h-4"></i>
+                </div>
+                <input id="filter-trx-search" oninput="FinFloApp.handleFilterChange()" type="text" placeholder="Cari transaksi / catatan..." class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white">
+              </div>
+
+              <!-- Month Picker Filter (Default Bulan Berjalan) -->
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <i data-lucide="calendar" class="w-4 h-4"></i>
+                </div>
+                <input id="filter-trx-month" onchange="FinFloApp.handleFilterChange()" type="month" title="Filter Bulan Transaksi (Default: Bulan Berjalan)" class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white font-medium">
+              </div>
+
+              <!-- Type Select -->
+              <div>
+                <select id="filter-trx-type" onchange="FinFloApp.handleFilterChange()" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white">
+                  <option value="all">Semua Tipe Transaksi</option>
+                  <option value="income">Pemasukan (Income)</option>
+                  <option value="expense">Pengeluaran (Expense)</option>
+                  <option value="transfer">Transfer Dompet</option>
+                </select>
+              </div>
+
+              <!-- Wallet Select -->
+              <div>
+                <select id="filter-trx-wallet" onchange="FinFloApp.handleFilterChange()" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white">
+                  <option value="all">Semua Dompet</option>
+                </select>
+              </div>
+
+              <!-- Category Select -->
+              <div>
+                <select id="filter-trx-category" onchange="FinFloApp.handleFilterChange()" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-brand-500 text-slate-900 dark:text-white">
+                  <option value="all">Semua Kategori</option>
+                </select>
+              </div>
+
+            </div>
+
+            <!-- Filter Summary Bar -->
+            <div class="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-2">
+              <span id="trx-filter-count" class="font-semibold text-slate-700 dark:text-slate-300">0 Transaksi</span>
+              <div class="flex items-center space-x-4">
+                <span>Pemasukan: <b id="trx-filter-total-in" class="text-emerald-600 font-mono-num">Rp 0</b></span>
+                <span>Pengeluaran: <b id="trx-filter-total-out" class="text-rose-600 font-mono-num">Rp 0</b></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transactions Table -->
+          <div class="glass-card rounded-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden shadow-xs">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50/80 dark:bg-slate-800/60 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                    <th class="py-3 px-4">Tanggal</th>
+                    <th class="py-3 px-4">Keterangan</th>
+                    <th class="py-3 px-4">Tipe</th>
+                    <th class="py-3 px-4">Kategori</th>
+                    <th class="py-3 px-4">Dompet</th>
+                    <th class="py-3 px-4 text-right">Nominal</th>
+                    <th class="py-3 px-3 text-right">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="trx-table-body" class="divide-y divide-slate-100 dark:divide-slate-800/60 text-sm"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB: HUTANG, PIUTANG & PAYLATER VIEW -->
+        <!-- ============================================================== -->
+        <div id="tab-content-debts" class="hidden space-y-6">
+
+          <!-- PRO PLAN GATEKEEPER (Displayed when on Free Tier) -->
+          <div id="debts-pro-gatekeeper" class="glass-card rounded-3xl p-8 sm:p-12 text-center border border-purple-200/80 dark:border-purple-900/60 relative overflow-hidden shadow-lg">
+            <div class="absolute -top-12 -right-12 w-48 h-48 bg-purple-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-12 -left-12 w-48 h-48 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <div class="relative z-10 max-w-xl mx-auto space-y-4">
+              <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center mx-auto shadow-lg shadow-purple-500/30">
+                <i data-lucide="crown" class="w-8 h-8"></i>
+              </div>
+
+              <div>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-950 dark:to-indigo-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5 mr-1 text-purple-600"></i> Fitur Eksklusif FinFlo Pro Plan
+                </span>
+                <h3 class="text-2xl font-extrabold text-slate-900 dark:text-white mt-3">
+                  Pelacak Hutang, Piutang & Paylater
+                </h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                  Fitur ini dirancang khusus untuk pengguna <b>FinFlo Pro</b>. Pantau tagihan cicilan Shopee PayLater, GoPay Later, Kredivo, dan pinjaman pribadi agar terbebas dari denda keterlambatan!
+                </p>
+              </div>
+
+              <!-- 3 Feature Highlights -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 text-left">
+                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
+                  <div class="w-7 h-7 rounded-lg bg-purple-100 dark:bg-purple-900/60 text-purple-600 flex items-center justify-center mb-2">
+                    <i data-lucide="bell-ring" class="w-4 h-4"></i>
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200">Alarm Jatuh Tempo</h4>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Pengingat tanggal bayar terdekat otomatis.</p>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
+                  <div class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 flex items-center justify-center mb-2">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200">Bayar Langsung</h4>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Otomatis sinkron & potong saldo dompet.</p>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
+                  <div class="w-7 h-7 rounded-lg bg-sky-100 dark:bg-sky-900/60 text-sky-600 flex items-center justify-center mb-2">
+                    <i data-lucide="hand-coins" class="w-4 h-4"></i>
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200">Lacak Piutang</h4>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Catat uang Anda di teman & status pelunasan.</p>
+                </div>
+              </div>
+
+              <!-- Unlock CTA Button -->
+              <div class="pt-4">
+                <button onclick="FinFloApp.simulateUpgradePro()" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 via-indigo-600 to-brand-600 hover:from-purple-700 hover:to-brand-700 text-white font-extrabold text-sm shadow-lg shadow-purple-500/25 transition-all transform active:scale-95">
+                  ⚡ Buka Kunci Fitur Ini (Simulasi Upgrade Pro)
+                </button>
+                <p class="text-[11px] text-slate-400 mt-2">Termasuk dompet & custom kategori tak terbatas.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- MAIN DEBT CONTENT (Unlocked for Pro Plan) -->
+          <div id="debts-pro-content" class="hidden space-y-6">
+            <!-- Header & Action -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 class="text-xl font-extrabold text-slate-900 dark:text-white flex items-center space-x-2">
+                  <span>Lacak Hutang, Piutang & Paylater</span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
+                    Pro Plan Active
+                  </span>
+                </h2>
+                <p class="text-xs text-slate-400 mt-0.5">Daftar diurutkan berdasarkan tanggal jatuh tempo terdekat</p>
+              </div>
+
+              <div class="flex items-center space-x-2">
+                <button onclick="FinFloApp.openAddDebtModal('paylater')" class="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-purple-600 hover:bg-purple-700 transition-colors shadow-xs">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
+                  <span>Catat Tagihan / Paylater</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- 3 Stats Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <!-- Card 1: Total Kewajiban -->
+              <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs card-hover">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Kewajiban</span>
+                  <div class="w-7 h-7 rounded-lg bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+                    <i data-lucide="credit-card" class="w-4 h-4"></i>
+                  </div>
+                </div>
+                <h3 id="debt-stat-kewajiban" class="text-2xl font-extrabold text-rose-600 dark:text-rose-400 mt-2 font-mono-num">Rp 0</h3>
+                <p class="text-[11px] text-slate-400 mt-1">Hutang & Paylater yang harus dilunasi</p>
+              </div>
+
+              <!-- Card 2: Total Piutang -->
+              <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs card-hover">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Piutang Saya</span>
+                  <div class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <i data-lucide="hand-coins" class="w-4 h-4"></i>
+                  </div>
+                </div>
+                <h3 id="debt-stat-piutang" class="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-2 font-mono-num">Rp 0</h3>
+                <p class="text-[11px] text-slate-400 mt-1">Uang Anda yang dipinjam orang lain</p>
+              </div>
+
+              <!-- Card 3: Active Status -->
+              <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs card-hover">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Status Tagihan</span>
+                  <div class="w-7 h-7 rounded-lg bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                    <i data-lucide="bell" class="w-4 h-4"></i>
+                  </div>
+                </div>
+                <h3 id="debt-stat-count" class="text-2xl font-extrabold text-slate-900 dark:text-white mt-2 font-mono-num">0 Tagihan Aktif</h3>
+                <p class="text-[11px] text-slate-400 mt-1">Diurutkan dari yang paling dekat</p>
+              </div>
+            </div>
+
+            <!-- Filter Toolbar Card -->
+            <div class="glass-card rounded-2xl p-4 border border-slate-200/80 dark:border-slate-800">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <!-- Search -->
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                  </div>
+                  <input id="filter-debt-search" oninput="FinFloApp.handleDebtFilterChange()" type="text" placeholder="Cari tagihan, pihak, atau catatan..." class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500 text-slate-900 dark:text-white">
+                </div>
+
+                <!-- Type Select -->
+                <div>
+                  <select id="filter-debt-type" onchange="FinFloApp.handleDebtFilterChange()" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500 text-slate-900 dark:text-white">
+                    <option value="all">Semua Jenis Tagihan</option>
+                    <option value="paylater">Paylater / Cicilan E-Commerce</option>
+                    <option value="hutang">Hutang Saya (Pribadi / Lembaga)</option>
+                    <option value="piutang">Piutang (Uang di Orang Lain)</option>
+                  </select>
+                </div>
+
+                <!-- Status Select -->
+                <div>
+                  <select id="filter-debt-status" onchange="FinFloApp.handleDebtFilterChange()" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500 text-slate-900 dark:text-white">
+                    <option value="all">Semua Status</option>
+                    <option value="unpaid">Belum Lunas (Aktif)</option>
+                    <option value="paid">Sudah Lunas</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cards Grid Container -->
+            <div id="debts-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+          </div>
+
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB: REKOMENDASI KEUANGAN AI (EXCLUSIVELY FOR PRO PLAN)        -->
+        <!-- ============================================================== -->
+        <div id="tab-content-recommendations" class="hidden space-y-8">
+
+          <!-- 1. PRO GATEKEEPER (For Free Tier) -->
+          <div id="recomms-pro-gatekeeper" class="glass-card rounded-3xl p-8 sm:p-12 text-center border-2 border-dashed border-amber-300 dark:border-amber-700/60 shadow-lg relative overflow-hidden">
+            <div class="absolute -right-16 -top-16 w-48 h-48 bg-amber-400/10 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -left-16 -bottom-16 w-48 h-48 bg-orange-400/10 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="relative z-10 max-w-xl mx-auto space-y-4">
+              <div class="w-16 h-16 rounded-3xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-amber-500/30">
+                <i data-lucide="sparkles" class="w-8 h-8"></i>
+              </div>
+
+              <div>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-950 dark:to-orange-950 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
+                  <i data-lucide="crown" class="w-3.5 h-3.5 mr-1 text-amber-500"></i> Fitur Eksklusif FinFlo Pro Plan
+                </span>
+                <h3 class="text-2xl font-extrabold text-slate-900 dark:text-white mt-3">
+                  AI Financial Health Advisor & Rekomendasi
+                </h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+                  Fitur ini menganalisis seluruh arus kas, kebiasaan belanja, dan portofolio Anda secara cerdas. Dapatkan skor kesehatan finansial, audit aturan 50/30/20, deteksi kebocoran anggaran, serta strategi bebas hutang layaknya memiliki perencana keuangan profesional!
+                </p>
+              </div>
+
+              <!-- 3 Feature Highlights -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 text-left">
+                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
+                  <div class="w-7 h-7 rounded-lg bg-amber-100 dark:bg-amber-900/60 text-amber-600 flex items-center justify-center mb-2">
+                    <i data-lucide="gauge" class="w-4 h-4"></i>
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200">Skor Kesehatan Finansial</h4>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Penilaian komprehensif 0-100 dengan diagnosa cerdas.</p>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
+                  <div class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/60 text-emerald-600 flex items-center justify-center mb-2">
+                    <i data-lucide="pie-chart" class="w-4 h-4"></i>
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200">Audit Aturan 50/30/20</h4>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Pemisahan kebutuhan pokok, keinginan, & tabungan.</p>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60">
+                  <div class="w-7 h-7 rounded-lg bg-sky-100 dark:bg-sky-900/60 text-sky-600 flex items-center justify-center mb-2">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200">Roadmap Bebas Hutang</h4>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Strategi pelunasan hutang & kesiapan dana darurat.</p>
+                </div>
+              </div>
+
+              <!-- Unlock CTA Button -->
+              <div class="pt-4">
+                <button onclick="FinFloApp.simulateUpgradePro()" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-brand-600 hover:from-amber-600 hover:to-brand-700 text-white font-extrabold text-sm shadow-lg shadow-amber-500/25 transition-all transform active:scale-95">
+                  ⚡ Buka Kunci Fitur Ini (Simulasi Upgrade Pro)
+                </button>
+                <p class="text-[11px] text-slate-400 mt-2">Dapatkan analisis otomatis tanpa batas waktu.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. UNLOCKED PRO CONTENT -->
+          <div id="recomms-pro-content" class="hidden space-y-8">
+            <!-- Header Toolbar -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 class="text-xl font-extrabold text-slate-900 dark:text-white flex items-center space-x-2">
+                  <span>Rekomendasi Keuangan FinFlo AI Advisor</span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-xs">PRO</span>
+                </h2>
+                <p class="text-xs text-slate-400 mt-1">Diagnosis otomatis & rencana aksi finansial yang dipersonalisasi untuk akun Anda</p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button onclick="FinFloApp.refreshRecommendations()" class="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors">
+                  <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                  <span>Refresh Analisis</span>
+                </button>
+                <button onclick="window.print()" class="inline-flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 transition-colors shadow-xs">
+                  <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+                  <span>Cetak / PDF</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- SCORECARD & 4 CORE METRICS -->
+            <div class="glass-card rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-800 shadow-sm relative overflow-hidden">
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                <!-- Score Display Left -->
+                <div class="lg:col-span-4 flex flex-col items-center justify-center p-4 bg-gradient-to-br from-slate-50 to-slate-100/70 dark:from-slate-800/60 dark:to-slate-900/60 rounded-2xl border border-slate-200/60 dark:border-slate-700/60 text-center">
+                  <span class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Financial Health Score</span>
+                  <div class="relative w-28 h-28 flex items-center justify-center">
+                    <svg class="w-28 h-28 transform -rotate-90" viewBox="0 0 100 100">
+                      <circle cx="50" cy="50" r="42" stroke="currentColor" stroke-width="8" class="text-slate-200 dark:text-slate-700" fill="transparent"/>
+                      <circle id="recomm-score-circle" cx="50" cy="50" r="42" stroke="currentColor" stroke-width="8" stroke-dasharray="264" stroke-dashoffset="40" class="text-emerald-500 transition-all duration-1000 ease-out" fill="transparent" stroke-linecap="round"/>
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+                      <span id="recomm-score-val" class="text-3xl font-extrabold text-slate-900 dark:text-white font-mono-num leading-tight">85</span>
+                      <span class="text-[10px] text-slate-400 font-semibold uppercase">dari 100</span>
+                    </div>
+                  </div>
+                  <div id="recomm-score-status" class="mt-3 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300">
+                    Kondisi Sangat Sehat
+                  </div>
+                </div>
+
+                <!-- 4 Metrics Right -->
+                <div class="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <!-- Metric 1: Savings Rate -->
+                  <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Rasio Tabungan (Savings)</span>
+                      <span id="recomm-badge-savings" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Target >= 20%</span>
+                    </div>
+                    <div class="mt-2 flex items-baseline justify-between">
+                      <h4 id="recomm-stat-savings-rate" class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono-num">53.6%</h4>
+                      <span id="recomm-stat-savings-nominal" class="text-xs text-slate-400 font-mono-num">Rp 5.250.000 / bln</span>
+                    </div>
+                    <p id="recomm-desc-savings" class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Sangat baik! Surplus bulanan Anda berada di atas rekomendasi perencana keuangan.</p>
+                  </div>
+
+                  <!-- Metric 2: Debt Service Ratio (DSR) -->
+                  <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Beban Cicilan (DSR)</span>
+                      <span id="recomm-badge-dsr" class="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300">Batas Max 30%</span>
+                    </div>
+                    <div class="mt-2 flex items-baseline justify-between">
+                      <h4 id="recomm-stat-dsr" class="text-xl font-extrabold text-slate-800 dark:text-slate-200 font-mono-num">23.9%</h4>
+                      <span id="recomm-stat-dsr-nominal" class="text-xs text-slate-400 font-mono-num">Rp 2.340.000</span>
+                    </div>
+                    <p id="recomm-desc-dsr" class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Sehat. Beban cicilan paylater & hutang masih dalam ambang batas aman.</p>
+                  </div>
+
+                  <!-- Metric 3: Emergency Fund -->
+                  <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Kesiapan Dana Darurat</span>
+                      <span id="recomm-badge-emergency" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">Target 6 Bulan</span>
+                    </div>
+                    <div class="mt-2 flex items-baseline justify-between">
+                      <h4 id="recomm-stat-emergency-months" class="text-xl font-extrabold text-amber-600 dark:text-amber-400 font-mono-num">3.4 Bulan</h4>
+                      <span id="recomm-stat-emergency-nominal" class="text-xs text-slate-400 font-mono-num">Rp 15.250.000</span>
+                    </div>
+                    <p id="recomm-desc-emergency" class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Cukup baik. Disarankan menambah cadangan hingga mencapai 6 bulan biaya hidup.</p>
+                  </div>
+
+                  <!-- Metric 4: Budget Adherence -->
+                  <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Disiplin Pengeluaran</span>
+                      <span id="recomm-badge-discipline" class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Terkontrol</span>
+                    </div>
+                    <div class="mt-2 flex items-baseline justify-between">
+                      <h4 id="recomm-stat-discipline-score" class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono-num">46.4%</h4>
+                      <span class="text-xs text-slate-400">Total Biaya Hidup</span>
+                    </div>
+                    <p id="recomm-desc-discipline" class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Pengeluaran bulanan tidak melampaui 50% dari pemasukan. Arus kas sangat positif.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 2: 50 / 30 / 20 BUDGET ALLOCATION AUDIT -->
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="text-base font-bold text-slate-900 dark:text-white">Audit Formula Finansial 50 / 30 / 20</h3>
+                  <p class="text-xs text-slate-400">Perbandingan pola alokasi pengeluaran aktual Anda terhadap standar ideal internasional</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <!-- 50% Needs Card -->
+                <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                      <div class="w-8 h-8 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 flex items-center justify-center font-bold text-xs">
+                        50%
+                      </div>
+                      <div>
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Kebutuhan Pokok</h4>
+                        <p class="text-[11px] text-slate-400">Makan, Listrik, Transport</p>
+                      </div>
+                    </div>
+                    <span id="recomm-needs-pct" class="text-sm font-extrabold font-mono-num text-blue-600 dark:text-blue-400">25.0%</span>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-xs text-slate-500 mb-1">
+                      <span>Aktual: <b id="recomm-needs-nominal" class="text-slate-800 dark:text-slate-200">Rp 2.450.000</b></span>
+                      <span>Target: Maks 50%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                      <div id="recomm-needs-bar" class="bg-blue-500 h-2 rounded-full transition-all duration-700" style="width: 25%;"></div>
+                    </div>
+                  </div>
+                  <p id="recomm-needs-diagnosis" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    ✅ <b>Sangat Sehat</b>: Pengeluaran primer Anda terkendali dengan baik di bawah pagu 50% pemasukan.
+                  </p>
+                </div>
+
+                <!-- 30% Wants Card -->
+                <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                      <div class="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 flex items-center justify-center font-bold text-xs">
+                        30%
+                      </div>
+                      <div>
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Keinginan / Lifestyle</h4>
+                        <p class="text-[11px] text-slate-400">Belanja, Cafe, Rekreasi</p>
+                      </div>
+                    </div>
+                    <span id="recomm-wants-pct" class="text-sm font-extrabold font-mono-num text-purple-600 dark:text-purple-400">21.4%</span>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-xs text-slate-500 mb-1">
+                      <span>Aktual: <b id="recomm-wants-nominal" class="text-slate-800 dark:text-slate-200">Rp 2.100.000</b></span>
+                      <span>Target: Maks 30%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                      <div id="recomm-wants-bar" class="bg-purple-500 h-2 rounded-full transition-all duration-700" style="width: 21%;"></div>
+                    </div>
+                  </div>
+                  <p id="recomm-wants-diagnosis" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    ✅ <b>Terkendali</b>: Pengeluaran lifestyle Anda tidak melebihi batas 30%. Pertahankan disiplin ini.
+                  </p>
+                </div>
+
+                <!-- 20% Savings Card -->
+                <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                      <div class="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                        20%
+                      </div>
+                      <div>
+                        <h4 class="text-sm font-bold text-slate-800 dark:text-slate-200">Tabungan & Investasi</h4>
+                        <p class="text-[11px] text-slate-400">Surplus Kas & Portofolio</p>
+                      </div>
+                    </div>
+                    <span id="recomm-savings-pct" class="text-sm font-extrabold font-mono-num text-emerald-600 dark:text-emerald-400">53.6%</span>
+                  </div>
+                  <div>
+                    <div class="flex justify-between text-xs text-slate-500 mb-1">
+                      <span>Surplus: <b id="recomm-savings-nominal" class="text-slate-800 dark:text-slate-200">Rp 5.250.000</b></span>
+                      <span>Target: Min 20%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
+                      <div id="recomm-savings-bar" class="bg-emerald-500 h-2 rounded-full transition-all duration-700" style="width: 53.6%;"></div>
+                    </div>
+                  </div>
+                  <p id="recomm-savings-diagnosis" class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    🌟 <b>Luar Biasa</b>: Anda menyisihkan lebih dari 20% pemasukan! Arus kas ini ideal dialihkan ke investasi produktif.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- SECTION 3: REKOMENDASI AKSI FINANSIAL CERDAS -->
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="text-base font-bold text-slate-900 dark:text-white">Rekomendasi Tindakan Finansial Prioritas</h3>
+                  <p class="text-xs text-slate-400">Langkah terarah untuk mengoptimalkan kekayaan dan meminimalkan risiko pengeluaran</p>
+                </div>
+              </div>
+
+              <div id="recomms-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <!-- Dynamically rendered by JS -->
+              </div>
+            </div>
+
+            <!-- SECTION 4: INTERACTIVE SAVINGS & WEALTH GOAL SIMULATOR -->
+            <div class="glass-card rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+              <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div>
+                  <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+                    <i data-lucide="target" class="w-5 h-5 text-brand-600"></i>
+                    <span>Simulator Pencapaian Target Keuangan</span>
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-0.5">Hitung estimasi waktu tercapainya impian finansial berdasarkan surplus kas bulanan Anda</p>
+                </div>
+                <div class="text-right">
+                  <span class="text-xs text-slate-400">Surplus Kas Anda Saat Ini:</span>
+                  <p id="sim-current-surplus" class="text-sm font-extrabold text-brand-600 dark:text-brand-400 font-mono-num">Rp 5.250.000 / bln</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                <!-- Simulator Controls Left -->
+                <div class="lg:col-span-7 space-y-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                      Nama Target Impian
+                    </label>
+                    <input id="sim-goal-name" oninput="FinFloApp.handleGoalSimulation()" type="text" value="Dana Liburan & Umroh" class="w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                      <span>Target Nominal Dana</span>
+                      <span id="sim-goal-target-text" class="text-brand-600 dark:text-brand-400 font-mono-num">Rp 25.000.000</span>
+                    </div>
+                    <input id="sim-goal-target" oninput="FinFloApp.handleGoalSimulation()" type="range" min="1000000" max="100000000" step="1000000" value="25000000" class="w-full accent-brand-600 cursor-pointer">
+                    <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                      <span>Rp 1 Juta</span>
+                      <span>Rp 50 Juta</span>
+                      <span>Rp 100 Juta</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div class="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                      <span>Alokasi Tabungan Bulanan</span>
+                      <span id="sim-goal-monthly-text" class="text-brand-600 dark:text-brand-400 font-mono-num">Rp 2.500.000 / bln</span>
+                    </div>
+                    <input id="sim-goal-monthly" oninput="FinFloApp.handleGoalSimulation()" type="range" min="500000" max="10000000" step="250000" value="2500000" class="w-full accent-brand-600 cursor-pointer">
+                    <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                      <span>Rp 500 Ribu</span>
+                      <span>Rp 5 Juta</span>
+                      <span>Rp 10 Juta</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Simulator Outcome Card Right -->
+                <div class="lg:col-span-5 p-5 rounded-2xl bg-gradient-to-br from-brand-600 to-teal-600 text-white shadow-lg space-y-4">
+                  <div class="flex items-center space-x-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-ping"></span>
+                    <span class="text-xs uppercase font-extrabold tracking-wider text-white/90">Hasil Proyeksi Real-Time</span>
+                  </div>
+
+                  <div>
+                    <p class="text-xs text-white/80">Target: <b id="sim-res-goal-title" class="text-white">Dana Liburan & Umroh</b></p>
+                    <h3 class="text-3xl font-extrabold mt-1 tracking-tight font-mono-num">
+                      <span id="sim-res-months">10</span> <span class="text-lg font-bold">Bulan</span>
+                    </h3>
+                    <p id="sim-res-date" class="text-xs text-white/90 mt-1">
+                      Estimasi tercapai pada: <b>September 2027</b>
+                    </p>
+                  </div>
+
+                  <div class="pt-3 border-t border-white/20 text-xs text-white/85 leading-relaxed">
+                    💡 <b>Tips FinFlo:</b> Dengan menyisihkan surplus bulanan yang realistis, target ini dapat dicapai secara konsisten tanpa mengorbankan pengeluaran pokok bulanan.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 3: DOMPET & KATEGORI VIEW (Free Tier Limits Enforced) -->
+        <!-- ============================================================== -->
+        <div id="tab-content-wallets" class="hidden space-y-8">
+          
+          <!-- Free Tier Meter Banner -->
+          <div class="glass-card rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+              <div>
+                <div class="flex items-center space-x-2">
+                  <h3 class="text-base font-bold text-slate-900 dark:text-white">Status Kuota Paket Free Tier</h3>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 dark:bg-brand-950 text-brand-700 dark:text-brand-300">
+                    Aktif
+                  </span>
+                </div>
+                <p class="text-xs text-slate-400 mt-0.5">Pantau penggunaan batas dompet dan kategori gratis Anda</p>
+              </div>
+              <button onclick="FinFloApp.openFreeTierModal('quota')" class="inline-flex items-center text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline">
+                <span>Pelajari Paket Pro</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
+              </button>
+            </div>
+
+            <!-- 2 Quota Bars -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Wallet Quota -->
+              <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60">
+                <div class="flex justify-between text-xs mb-1.5">
+                  <span class="font-semibold text-slate-700 dark:text-slate-300">Dompet Terdaftar</span>
+                  <span id="meter-wallet-count" class="font-bold text-brand-600 dark:text-brand-400">3 / 3</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                  <div id="meter-wallet-bar" class="bg-brand-500 h-2 rounded-full transition-all duration-500" style="width: 100%;"></div>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-2">Batas maksimal 3 dompet aktif pada Free Tier.</p>
+              </div>
+
+              <!-- Category Quota -->
+              <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/60 dark:border-slate-700/60">
+                <div class="flex justify-between text-xs mb-1.5">
+                  <span class="font-semibold text-slate-700 dark:text-slate-300">Kategori Pengeluaran</span>
+                  <span id="meter-cat-count" class="font-bold text-brand-600 dark:text-brand-400">5 / 5</span>
+                </div>
+                <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
+                  <div id="meter-cat-bar" class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 100%;"></div>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-2">Batas maksimal 5 kategori dasar pada Free Tier.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Manajemen Dompet (Max 3) -->
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">Daftar Dompet & Rekening</h3>
+                <p class="text-xs text-slate-400">Maksimal 3 dompet untuk akun Free Tier</p>
+              </div>
+              <button onclick="FinFloApp.handleAddNewWallet()" class="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors shadow-xs">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Tambah Dompet</span>
+              </button>
+            </div>
+
+            <!-- Wallets Grid -->
+            <div id="wallets-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+          </div>
+
+          <!-- Section: Manajemen Kategori Pengeluaran (Max 5) -->
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">Kategori Pengeluaran Dasar</h3>
+                <p class="text-xs text-slate-400">5 Kategori utama untuk melacak alokasi anggaran bulanan</p>
+              </div>
+              <button onclick="FinFloApp.handleAddNewCategory()" class="inline-flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Tambah Kategori</span>
+              </button>
+            </div>
+
+            <!-- Categories Grid -->
+            <div id="categories-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+          </div>
+
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 4: PROFIL / AKUN VIEW -->
+        <!-- ============================================================== -->
+        <div id="tab-content-profile" class="hidden space-y-6 max-w-3xl mx-auto">
+          
+          <!-- User Profile Card -->
+          <div class="glass-card rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-xs">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6 text-center sm:text-left">
+              <img id="profile-avatar" src="" alt="Profile Avatar" class="w-20 h-20 rounded-full ring-4 ring-brand-500/20 object-cover shadow-md">
+              <div class="flex-1">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div>
+                    <h3 id="profile-name" class="text-xl font-bold text-slate-900 dark:text-white">Budi Pratama</h3>
+                    <p id="profile-email" class="text-xs text-slate-500 dark:text-slate-400">budi.pratama@gmail.com</p>
+                  </div>
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-brand-50 dark:bg-brand-950/60 text-brand-700 dark:text-brand-300 border border-brand-200 dark:border-brand-800">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-500 mr-1.5"></span>
+                    Paket Free Tier
+                  </span>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
+                  <span>Anggota FinFlo sejak: <b id="profile-since" class="text-slate-800 dark:text-slate-200">Januari 2026</b></span>
+                  <span class="text-emerald-600 font-semibold flex items-center">
+                    <i data-lucide="shield-check" class="w-4 h-4 mr-1"></i> Terverifikasi Google
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Plan Comparison & Pro Teaser -->
+          <div class="glass-card rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800">
+            <h4 class="text-sm font-bold text-slate-900 dark:text-white mb-3">Detail Fitur Free Tier vs FinFlo Pro</h4>
+            <div class="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
+              <div class="py-2.5 flex items-center justify-between">
+                <span class="text-slate-600 dark:text-slate-400">Batas Dompet (Wallets)</span>
+                <span class="font-bold text-slate-800 dark:text-slate-200">3 Dompet (Free) <span class="text-brand-600 ml-1">/ Unlimited di Pro</span></span>
+              </div>
+              <div class="py-2.5 flex items-center justify-between">
+                <span class="text-slate-600 dark:text-slate-400">Batas Kategori Pengeluaran</span>
+                <span class="font-bold text-slate-800 dark:text-slate-200">5 Kategori Dasar (Free) <span class="text-brand-600 ml-1">/ Custom Tak Terbatas di Pro</span></span>
+              </div>
+              <div class="py-2.5 flex items-center justify-between">
+                <span class="text-slate-600 dark:text-slate-400">Pencatatan Pemasukan, Pengeluaran, Transfer</span>
+                <span class="font-bold text-emerald-600">✓ Tak Terbatas</span>
+              </div>
+              <div class="py-2.5 flex items-center justify-between">
+                <span class="text-slate-600 dark:text-slate-400">Ekspor Data CSV & Grafik Dinamis</span>
+                <span class="font-bold text-emerald-600">✓ Termasuk</span>
+              </div>
+              <div class="py-2.5 flex items-center justify-between">
+                <span class="text-slate-600 dark:text-slate-400">Lacak Hutang, Piutang & Paylater</span>
+                <span class="font-bold text-slate-800 dark:text-slate-200"><span class="text-slate-400 font-normal">❌ Tidak Ada (Free)</span> <span class="text-purple-600 ml-1">/ ✅ Khusus Pro</span></span>
+              </div>
+              <div class="py-2.5 flex items-center justify-between">
+                <span class="text-slate-600 dark:text-slate-400">AI Advisor & Audit Formula 50/30/20</span>
+                <span class="font-bold text-slate-800 dark:text-slate-200"><span class="text-slate-400 font-normal">❌ Tidak Ada (Free)</span> <span class="text-amber-500 ml-1">/ ✅ Eksklusif Pro</span></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preferences & Data Management -->
+          <div class="glass-card rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 space-y-4">
+            <h4 class="text-sm font-bold text-slate-900 dark:text-white">Pengaturan & Manajemen Data</h4>
+            
+            <div class="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800">
+              <div>
+                <p class="text-xs font-semibold text-slate-800 dark:text-slate-200">Tema Tampilan</p>
+                <p id="profile-theme-label" class="text-[11px] text-slate-400">Mode Terang Aktif</p>
+              </div>
+              <button onclick="FinFloApp.toggleTheme()" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                Ganti Tema
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800">
+              <div>
+                <p class="text-xs font-semibold text-slate-800 dark:text-slate-200">Cadangkan Data (JSON)</p>
+                <p class="text-[11px] text-slate-400">Unduh seluruh catatan transaksi dan dompet</p>
+              </div>
+              <button onclick="FinFloApp.exportAllDataJSON()" class="px-3 py-1.5 rounded-xl text-xs font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/40 hover:bg-brand-100 transition-colors">
+                Unduh JSON
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between py-2">
+              <div>
+                <p class="text-xs font-semibold text-slate-800 dark:text-slate-200">Reset Data ke Default Mockup</p>
+                <p class="text-[11px] text-slate-400">Kembalikan data transaksi & saldo awal demo Budi</p>
+              </div>
+              <button onclick="FinFloApp.resetToDefaults()" class="px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 transition-colors">
+                Reset Demo
+              </button>
+            </div>
+          </div>
+
+          <!-- Logout Button -->
+          <div class="text-center pt-2">
+            <button onclick="FinFloApp.logout()" class="w-full py-3 px-4 rounded-2xl text-xs font-bold text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 bg-rose-50/50 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors">
+              Keluar dari Sesi FinFlo (Logout)
+            </button>
+          </div>
+
+        </div>
+
+      </main>
+
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR (Symmetrical 5 Tabs) -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2 py-1 grid grid-cols-5 items-center">
+      <button id="mob-nav-dashboard" onclick="FinFloApp.switchTab('dashboard')" class="flex flex-col items-center justify-center py-1.5 text-xs text-brand-600 font-semibold transition-colors">
+        <i data-lucide="layout-dashboard" class="w-5 h-5 mb-0.5"></i>
+        <span class="text-[11px]">Dashboard</span>
+      </button>
+
+      <button id="mob-nav-transactions" onclick="FinFloApp.switchTab('transactions')" class="flex flex-col items-center justify-center py-1.5 text-xs text-slate-500 transition-colors">
+        <i data-lucide="arrow-left-right" class="w-5 h-5 mb-0.5"></i>
+        <span class="text-[11px]">Transaksi</span>
+      </button>
+
+      <button id="mob-nav-debts" onclick="FinFloApp.switchTab('debts')" class="flex flex-col items-center justify-center py-1.5 text-xs text-slate-500 transition-colors">
+        <i data-lucide="badge-percent" class="w-5 h-5 mb-0.5"></i>
+        <span class="text-[11px]">Hutang</span>
+      </button>
+
+      <button id="mob-nav-wallets" onclick="FinFloApp.switchTab('wallets')" class="flex flex-col items-center justify-center py-1.5 text-xs text-slate-500 transition-colors">
+        <i data-lucide="wallet" class="w-5 h-5 mb-0.5"></i>
+        <span class="text-[11px]">Dompet</span>
+      </button>
+
+      <button id="mob-nav-profile" onclick="FinFloApp.switchTab('profile')" class="flex flex-col items-center justify-center py-1.5 text-xs text-slate-500 transition-colors">
+        <i data-lucide="user" class="w-5 h-5 mb-0.5"></i>
+        <span class="text-[11px]">Profil</span>
+      </button>
+    </nav>
+
+    <!-- FLOATING ACTION BUTTON (CATAT TRANSAKSI) - FLOATING KANAN BAWAH -->
+    <button id="fab-add-transaction" onclick="FinFloApp.openTransactionModal('expense')" title="Catat Transaksi Baru" class="fixed bottom-20 right-4 sm:right-6 z-40 flex items-center space-x-2 px-4 py-3 rounded-full bg-gradient-to-r from-brand-600 to-teal-500 text-white font-bold text-xs shadow-xl shadow-brand-500/35 hover:from-brand-700 hover:to-teal-600 active:scale-95 hover:scale-105 transition-all">
+      <i data-lucide="plus" class="w-5 h-5"></i>
+      <span class="font-bold tracking-wide">Catat</span>
+    </button>
+
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: TAMBAH TRANSAKSI (Dynamic Expense, Income, Transfer) -->
+  <!-- ============================================================== -->
+  <div id="modal-add-transaction" class="hidden fixed inset-0 z-50 items-center justify-center p-4">
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs modal-overlay modal-backdrop-click" onclick="FinFloApp.closeTransactionModal()"></div>
+    
+    <!-- Modal Card -->
+    <div class="relative bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-800 modal-content z-10 max-h-[90vh] flex flex-col">
+      
+      <!-- Modal Header (Fixed at top) -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
+        <div>
+          <h3 id="trx-modal-title" class="text-lg font-bold text-slate-900 dark:text-white">Tambah Transaksi Baru</h3>
+          <p class="text-xs text-slate-400">Catat pemasukan, pengeluaran atau transfer</p>
+        </div>
+        <button onclick="FinFloApp.closeTransactionModal()" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Segmented Control Tabs (Pengeluaran, Pemasukan, Transfer) (Fixed) -->
+      <div class="flex p-1 mt-3 mb-1 rounded-xl bg-slate-100 dark:bg-slate-800 shrink-0">
+        <button id="modal-tab-expense" type="button" onclick="FinFloApp.setTransactionModalTab('expense')" class="flex-1 py-2 text-xs font-bold rounded-lg bg-white dark:bg-slate-700 shadow-xs text-slate-800 dark:text-slate-100 transition-all">
+          Pengeluaran
+        </button>
+        <button id="modal-tab-income" type="button" onclick="FinFloApp.setTransactionModalTab('income')" class="flex-1 py-2 text-xs font-medium rounded-lg text-slate-500 dark:text-slate-400 transition-all">
+          Pemasukan
+        </button>
+        <button id="modal-tab-transfer" type="button" onclick="FinFloApp.setTransactionModalTab('transfer')" class="flex-1 py-2 text-xs font-medium rounded-lg text-slate-500 dark:text-slate-400 transition-all">
+          Transfer
+        </button>
+      </div>
+
+      <!-- Transaction Form with Scrollable Body & Sticky Footer -->
+      <form onsubmit="FinFloApp.handleSaveTransaction(event)" class="flex-1 flex flex-col min-h-0 mt-2">
+        
+        <!-- Scrollable Inputs Area -->
+        <div class="overflow-y-auto pr-1 flex-1 space-y-3.5 py-1">
+          <!-- Nominal Input (Formatted IDR) -->
+          <div>
+            <label for="trx-amount" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+              Nominal (Rupiah)
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center font-bold text-slate-400 text-sm">Rp</span>
+              <input id="trx-amount" type="text" required placeholder="0" class="block w-full pl-11 pr-3 py-2.5 text-lg font-bold font-mono-num bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+            </div>
+          </div>
+
+          <!-- Title / Description -->
+          <div>
+            <label for="trx-title" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+              Keterangan / Judul
+            </label>
+            <input id="trx-title" type="text" required placeholder="Contoh: Belanja Bulanan, Gaji, dll." class="block w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+          </div>
+
+          <!-- Date Picker -->
+          <div>
+            <label for="trx-date" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+              Tanggal
+            </label>
+            <input id="trx-date" type="date" required class="block w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+          </div>
+
+          <!-- Single Wallet Selector (For Expense & Income) -->
+          <div id="group-trx-single-wallet">
+            <label for="trx-wallet" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+              Dompet Terkait
+            </label>
+            <select id="trx-wallet" class="block w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500"></select>
+          </div>
+
+          <!-- Double Wallet Selector (For Transfer) -->
+          <div id="group-trx-transfer-wallets" class="hidden grid grid-cols-2 gap-3">
+            <div>
+              <label for="trx-from-wallet" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                Dari Dompet
+              </label>
+              <select id="trx-from-wallet" class="block w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"></select>
+            </div>
+            <div>
+              <label for="trx-to-wallet" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                Ke Dompet
+              </label>
+              <select id="trx-to-wallet" class="block w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white"></select>
+            </div>
+          </div>
+
+          <!-- Category Selector -->
+          <div id="group-trx-category">
+            <div class="flex items-center justify-between mb-1">
+              <label for="trx-category" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                Kategori
+              </label>
+              <span class="text-[10px] text-slate-400">Pilihan Kategori Aktif</span>
+            </div>
+            <select id="trx-category" class="block w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500"></select>
+          </div>
+
+          <!-- Notes (Optional) -->
+          <div>
+            <label for="trx-notes" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+              Catatan Tambahan (Opsional)
+            </label>
+            <input id="trx-notes" type="text" placeholder="Detail transaksi..." class="block w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <!-- Sticky Footer Submit Button -->
+        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 shrink-0">
+          <button id="trx-modal-submit-btn" type="submit" class="w-full flex justify-center py-3 px-4 rounded-2xl text-sm font-bold text-white bg-gradient-to-r from-brand-600 to-teal-500 hover:from-brand-700 hover:to-teal-600 shadow-md shadow-brand-500/25 transition-all">
+            Simpan Transaksi
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: GOOGLE ACCOUNT CHOOSER (Simulated Realistic Google Sign-in) -->
+  <!-- ============================================================== -->
+  <div id="modal-google-auth" class="hidden fixed inset-0 z-50 items-center justify-center p-4">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs modal-overlay modal-backdrop-click" onclick="FinFloApp.closeGoogleModal()"></div>
+    
+    <div class="relative bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 modal-content z-10">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div class="flex items-center space-x-2">
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span class="text-sm font-bold text-slate-800 dark:text-slate-200">Pilih Akun Google</span>
+        </div>
+        <button onclick="FinFloApp.closeGoogleModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="mt-4 space-y-2.5">
+        <!-- Account 1: Budi Pratama (Mockup preset) -->
+        <div onclick="FinFloApp.selectGoogleAccount('budi')" class="flex items-center space-x-3 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-all">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Budi" class="w-10 h-10 rounded-full object-cover">
+          <div class="flex-1 truncate">
+            <p class="text-sm font-bold text-slate-900 dark:text-white">Budi Pratama</p>
+            <p class="text-xs text-slate-400 truncate">budi.pratama@gmail.com</p>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+        </div>
+
+        <!-- Account 2: Siti Rahmawati -->
+        <div onclick="FinFloApp.selectGoogleAccount('siti')" class="flex items-center space-x-3 p-3 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-all">
+          <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" alt="Siti" class="w-10 h-10 rounded-full object-cover">
+          <div class="flex-1 truncate">
+            <p class="text-sm font-bold text-slate-900 dark:text-white">Siti Rahmawati</p>
+            <p class="text-xs text-slate-400 truncate">siti.rahmawati@gmail.com</p>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+        </div>
+
+        <!-- Account 3: Custom Input Inline (No prompt alert) -->
+        <div class="pt-2 border-t border-slate-100 dark:border-slate-800">
+          <button type="button" onclick="FinFloApp.toggleGoogleCustomInput()" class="w-full flex items-center justify-between text-xs font-semibold text-brand-600 dark:text-brand-400 py-1 hover:underline">
+            <span class="flex items-center"><i data-lucide="user-plus" class="w-3.5 h-3.5 mr-1.5"></i> Gunakan Akun Google Lain</span>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5"></i>
+          </button>
+          <div id="google-custom-form-wrapper" class="hidden mt-2.5 space-y-2">
+            <input id="google-custom-name" type="text" placeholder="Nama Lengkap (Contoh: Andi Wijaya)" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+            <input id="google-custom-email" type="email" placeholder="andi.wijaya@gmail.com" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+            <button type="button" onclick="FinFloApp.submitGoogleCustomAccount()" class="w-full py-2 rounded-xl text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors shadow-xs">
+              Masuk dengan Akun Ini
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-[11px] text-slate-400 text-center mt-5">
+        Untuk melanjutkan, Google akan membagikan nama dan email Anda ke FinFlo.
+      </p>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: FREE TIER LIMIT ALERT / UPGRADE TEASER -->
+  <!-- ============================================================== -->
+  <div id="modal-free-tier" class="hidden fixed inset-0 z-50 items-center justify-center p-4">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs modal-overlay modal-backdrop-click" onclick="FinFloApp.closeFreeTierModal()"></div>
+    
+    <div class="relative bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-800 modal-content z-10 text-center">
+      
+      <div class="w-14 h-14 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="lock" class="w-7 h-7"></i>
+      </div>
+
+      <h3 id="free-tier-modal-title" class="text-lg font-bold text-slate-900 dark:text-white">
+        Batas Free Tier Tercapai
+      </h3>
+
+      <p id="free-tier-modal-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">
+        Paket Free Tier dibatasi maksimal 3 dompet aktif dan 5 kategori pengeluaran dasar.
+      </p>
+
+      <!-- Feature Table Teaser -->
+      <div class="mt-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 text-left text-xs space-y-2">
+        <div class="flex justify-between font-semibold">
+          <span class="text-slate-500">Dompet Tersedia:</span>
+          <span class="text-slate-800 dark:text-slate-200">Maks. 3 Dompet (Tunai, BCA, GoPay)</span>
+        </div>
+        <div class="flex justify-between font-semibold">
+          <span class="text-slate-500">Kategori Tersedia:</span>
+          <span class="text-slate-800 dark:text-slate-200">Maks. 5 Kategori Dasar</span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="mt-6 flex flex-col space-y-2">
+        <button onclick="FinFloApp.simulateUpgradePro()" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 transition-all shadow-sm">
+          Simulasi Upgrade ke FinFlo Pro (Buka Kunci Kuota)
+        </button>
+        <button onclick="FinFloApp.closeFreeTierModal()" class="w-full py-2 px-4 rounded-xl text-xs font-semibold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          Tutup
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: EDIT WALLET MODAL -->
+  <!-- ============================================================== -->
+  <div id="modal-edit-wallet" class="hidden fixed inset-0 z-50 items-center justify-center p-4">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs modal-overlay modal-backdrop-click" onclick="FinFloApp.closeEditWalletModal()"></div>
+    
+    <div class="relative bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 modal-content z-10">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white">Edit Saldo & Nama Dompet</h3>
+        <button onclick="FinFloApp.closeEditWalletModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form onsubmit="FinFloApp.saveEditedWallet(event)" class="mt-4 space-y-3">
+        <input type="hidden" id="edit-wallet-id">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Nama Dompet
+          </label>
+          <input id="edit-wallet-name" type="text" required class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Saldo Saat Ini (Rupiah)
+          </label>
+          <input id="edit-wallet-balance" type="number" required class="w-full px-3 py-2 text-sm font-mono-num bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white">
+        </div>
+        <div class="pt-2">
+          <button type="submit" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors">
+            Simpan Perubahan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: CONFIRM ACTION DIALOG -->
+  <!-- ============================================================== -->
+  <div id="modal-confirm" class="hidden fixed inset-0 z-50 items-center justify-center p-4">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs modal-overlay modal-backdrop-click" onclick="FinFloApp.closeConfirmModal()"></div>
+    
+    <div class="relative bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 modal-content z-10 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="help-circle" class="w-6 h-6"></i>
+      </div>
+      <h3 id="confirm-title" class="text-base font-bold text-slate-900 dark:text-white">Konfirmasi Tindakan</h3>
+      <p id="confirm-message" class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">Apakah Anda yakin ingin melanjutkan?</p>
+      
+      <div class="mt-5 flex space-x-2">
+        <button onclick="FinFloApp.closeConfirmModal()" class="flex-1 py-2 px-3 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 transition-colors">
+          Batal
+        </button>
+        <button id="confirm-action-btn" onclick="FinFloApp.executeConfirmAction()" class="flex-1 py-2 px-3 rounded-xl text-xs font-semibold text-white bg-brand-600 hover:bg-brand-700 transition-colors">
+          Ya, Lanjutkan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: TAMBAH HUTANG / PIUTANG / PAYLATER -->
+  <!-- ============================================================== -->
+  <div id="modal-add-debt" class="hidden fixed inset-0 z-50 items-center justify-center p-4">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs modal-overlay modal-backdrop-click" onclick="FinFloApp.closeAddDebtModal()"></div>
+    
+    <div class="relative bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-800 modal-content z-10 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Catat Tagihan & Paylater</h3>
+          <p class="text-xs text-slate-400">Kelola cicilan paylater, hutang pribadi, atau piutang</p>
+        </div>
+        <button onclick="FinFloApp.closeAddDebtModal()" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="FinFloApp.handleSaveDebt(event)" class="mt-4 space-y-3.5">
+        <!-- Tipe Tagihan -->
+        <div>
+          <label for="debt-input-type" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Jenis Tagihan
+          </label>
+          <select id="debt-input-type" class="block w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-purple-500">
+            <option value="paylater">Paylater / Cicilan E-Commerce (Shopee, GoPay, Kredivo)</option>
+            <option value="hutang">Hutang Saya (Pinjaman ke Orang / Lembaga)</option>
+            <option value="piutang">Piutang (Uang Saya yang Dipinjam Orang Lain)</option>
+          </select>
+        </div>
+
+        <!-- Judul / Keperluan -->
+        <div>
+          <label for="debt-input-title" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Judul / Keperluan Tagihan
+          </label>
+          <input id="debt-input-title" type="text" required placeholder="Contoh: Shopee PayLater - Beli Laptop, Talangan Tiket..." class="block w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <!-- Pihak Terkait -->
+        <div>
+          <label for="debt-input-party" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Pihak Terkait / Penyedia Layanan
+          </label>
+          <input id="debt-input-party" type="text" placeholder="Contoh: SPayLater, GoPay Later, Nama Teman, Bank BCA..." class="block w-full px-3.5 py-2.5 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <!-- 2 Kolom Nominal (Total & Sudah Dibayar) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="debt-input-amount" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+              Nominal Total (Rupiah)
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center font-bold text-slate-400 text-xs">Rp</span>
+              <input id="debt-input-amount" type="text" required placeholder="0" class="block w-full pl-9 pr-3 py-2 text-sm font-bold font-mono-num bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-purple-500">
+            </div>
+          </div>
+
+          <div>
+            <label for="debt-input-paid" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+              Sudah Dicicil / Dibayar
+            </label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center font-bold text-slate-400 text-xs">Rp</span>
+              <input id="debt-input-paid" type="text" placeholder="0" class="block w-full pl-9 pr-3 py-2 text-sm font-bold font-mono-num bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-purple-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Tanggal Jatuh Tempo -->
+        <div>
+          <label for="debt-input-date" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Tanggal Jatuh Tempo
+          </label>
+          <input id="debt-input-date" type="date" required class="block w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <!-- Catatan -->
+        <div>
+          <label for="debt-input-notes" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Catatan Tambahan (Opsional)
+          </label>
+          <input id="debt-input-notes" type="text" placeholder="Detail cicilan, nomor kontrak, janji bayar..." class="block w-full px-3.5 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-purple-500">
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-3">
+          <button type="submit" class="w-full flex justify-center py-3 px-4 rounded-2xl text-sm font-bold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-md shadow-purple-500/25 transition-all">
+            Simpan Catatan Tagihan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: BAYAR / CICIL HUTANG & PAYLATER -->
+  <!-- ============================================================== -->
+  <div id="modal-pay-debt" class="hidden fixed inset-0 z-50 items-center justify-center p-4">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs modal-overlay modal-backdrop-click" onclick="FinFloApp.closePayDebtModal()"></div>
+    
+    <div class="relative bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 modal-content z-10">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Bayar / Lunasi Tagihan</h3>
+          <p class="text-xs text-slate-400">Catat pembayaran dan potong saldo dompet</p>
+        </div>
+        <button onclick="FinFloApp.closePayDebtModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Debt Info Summary -->
+      <div class="mt-4 p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80">
+        <h4 id="pay-debt-title" class="text-sm font-bold text-slate-900 dark:text-white">Tagihan</h4>
+        <p id="pay-debt-party" class="text-xs text-slate-500 mt-0.5">Pihak</p>
+        <div class="mt-2 pt-2 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center text-xs">
+          <span class="text-slate-500 font-medium">Sisa yang harus dibayar:</span>
+          <span id="pay-debt-remaining" class="font-extrabold text-rose-600 dark:text-rose-400 font-mono-num text-sm">Rp 0</span>
+        </div>
+      </div>
+
+      <form onsubmit="FinFloApp.handleSaveDebtPayment(event)" class="mt-4 space-y-3">
+        <!-- Input Nominal Bayar -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label for="pay-debt-amount" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+              Nominal Pembayaran
+            </label>
+            <button type="button" onclick="FinFloApp.fillPayFullAmount()" class="text-[11px] font-bold text-brand-600 dark:text-brand-400 hover:underline">
+              Lunasi Semua
+            </button>
+          </div>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center font-bold text-slate-400 text-xs">Rp</span>
+            <input id="pay-debt-amount" type="text" required placeholder="0" class="block w-full pl-9 pr-3 py-2 text-sm font-bold font-mono-num bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <!-- Pilih Dompet -->
+        <div>
+          <label id="pay-debt-type-label" for="pay-debt-wallet" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Sumber Dana Pembayaran
+          </label>
+          <select id="pay-debt-wallet" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500"></select>
+        </div>
+
+        <!-- Checkbox Otomatis Sync Transaksi & Saldo -->
+        <div class="pt-1">
+          <label class="flex items-center space-x-2 text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
+            <input id="pay-debt-sync-trx" type="checkbox" checked class="rounded text-brand-600 focus:ring-brand-500 w-4 h-4">
+            <span>Otomatis catat transaksi & sesuaikan saldo dompet</span>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="pt-3">
+          <button type="submit" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-md transition-all">
+            Simpan & Konfirmasi Pembayaran
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: TAMBAH DOMPET BARU (FORM MODAL) -->
+  <!-- ============================================================== -->
+  <div id="modal-add-wallet" class="hidden fixed inset-0 z-50 items-center justify-center p-4">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs modal-overlay modal-backdrop-click" onclick="FinFloApp.closeAddWalletModal()"></div>
+    
+    <div class="relative bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 modal-content z-10">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Tambah Dompet Baru</h3>
+          <p class="text-xs text-slate-400">Kas tunai, rekening bank, atau e-wallet</p>
+        </div>
+        <button onclick="FinFloApp.closeAddWalletModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form onsubmit="FinFloApp.handleSaveWallet(event)" class="mt-4 space-y-3.5">
+        <div>
+          <label for="add-wallet-name" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Nama Dompet
+          </label>
+          <input id="add-wallet-name" type="text" required placeholder="Contoh: Bank Mandiri, OVO, Jago..." class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div>
+          <label for="add-wallet-type" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Jenis Dompet
+          </label>
+          <select id="add-wallet-type" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+            <option value="bank">Rekening Bank</option>
+            <option value="ewallet">E-Wallet (GoPay, OVO, Dana)</option>
+            <option value="cash">Uang Tunai / Cash</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="add-wallet-balance" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Saldo Awal (Rupiah)
+          </label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center font-bold text-slate-400 text-xs">Rp</span>
+            <input id="add-wallet-balance" type="text" placeholder="0" class="w-full pl-9 pr-3 py-2 text-sm font-bold font-mono-num bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+          </div>
+        </div>
+
+        <div>
+          <label for="add-wallet-color" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Tema Warna Kartu
+          </label>
+          <select id="add-wallet-color" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+            <option value="blue">Biru Royal (BCA / Mandiri)</option>
+            <option value="emerald">Hijau Emerald (Tunai / Syariah)</option>
+            <option value="sky">Cyan / Sky (GoPay / Blu)</option>
+            <option value="purple">Ungu / Purple (OVO / Jago)</option>
+          </select>
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-md shadow-brand-500/25 transition-all">
+            Simpan Dompet
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- MODAL: TAMBAH KATEGORI PENGELUARAN (MAX 100% BUDGET CAP) -->
+  <!-- ============================================================== -->
+  <div id="modal-add-category" class="hidden fixed inset-0 z-50 items-center justify-center p-4">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs modal-overlay modal-backdrop-click" onclick="FinFloApp.closeAddCategoryModal()"></div>
+    
+    <div class="relative bg-white dark:bg-slate-900 rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 modal-content z-10">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white">Tambah Kategori</h3>
+          <p class="text-xs text-slate-400">Atur alokasi budgeting (Maksimal 100%)</p>
+        </div>
+        <button onclick="FinFloApp.closeAddCategoryModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <!-- Quota Percentage Overview Banner -->
+      <div class="mt-3.5 p-3 rounded-2xl bg-brand-50 dark:bg-brand-950/40 border border-brand-200/70 dark:border-brand-800/60 text-xs space-y-1">
+        <div class="flex justify-between text-slate-600 dark:text-slate-300">
+          <span>Total Alokasi Saat Ini:</span>
+          <b id="cat-budget-current-total" class="font-bold text-brand-700 dark:text-brand-300">90%</b>
+        </div>
+        <div class="flex justify-between text-slate-600 dark:text-slate-300">
+          <span>Sisa Kuota Budgeting:</span>
+          <b id="cat-budget-remaining-quota" class="font-bold text-emerald-600 dark:text-emerald-400">10%</b>
+        </div>
+      </div>
+
+      <form onsubmit="FinFloApp.handleSaveCategory(event)" class="mt-4 space-y-3.5">
+        <div>
+          <label for="add-cat-name" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+            Nama Kategori
+          </label>
+          <input id="add-cat-name" type="text" required placeholder="Contoh: Kesehatan, Pendidikan, Zakat..." class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="add-cat-icon" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+              Ikon
+            </label>
+            <select id="add-cat-icon" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+              <option value="tag">🏷️ Label / Tag</option>
+              <option value="heart-pulse">❤️ Kesehatan</option>
+              <option value="graduation-cap">🎓 Pendidikan</option>
+              <option value="coffee">☕ Cafe / Nongkrong</option>
+              <option value="home">🏠 Tempat Tinggal</option>
+              <option value="gift">🎁 Hadiah & Donasi</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="add-cat-color" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+              Warna Tag
+            </label>
+            <select id="add-cat-color" class="w-full px-3 py-2 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+              <option value="#0284c7">Biru Cyan</option>
+              <option value="#10b981">Hijau Emerald</option>
+              <option value="#f97316">Oranye</option>
+              <option value="#ec4899">Pink</option>
+              <option value="#8b5cf6">Ungu</option>
+              <option value="#eab308">Kuning</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Persentase Budgeting (Capped at 100%) -->
+        <div>
+          <div class="flex justify-between items-center mb-1">
+            <label for="add-cat-percentage" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+              Alokasi Budget (%)
+            </label>
+            <span id="cat-budget-preview-nominal" class="text-[11px] font-bold text-slate-500">Estimasi: Rp 0</span>
+          </div>
+          <div class="relative">
+            <input id="add-cat-percentage" type="number" min="1" max="100" required oninput="FinFloApp.handleCategoryPercentageInput()" placeholder="Contoh: 10" class="w-full px-3 py-2 text-sm font-bold font-mono-num bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-brand-500">
+            <span class="absolute inset-y-0 right-0 pr-3 flex items-center font-bold text-slate-400 text-sm">%</span>
+          </div>
+          <!-- Warning Alert if exceeds 100% -->
+          <p id="cat-budget-warning" class="hidden text-xs text-rose-600 dark:text-rose-400 font-bold mt-1.5"></p>
+        </div>
+
+        <div class="pt-2">
+          <button id="btn-submit-add-cat" type="submit" class="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 shadow-md shadow-brand-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+            Simpan Kategori
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- APPLICATION SCRIPTS -->
+  <script src="js/mockData.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

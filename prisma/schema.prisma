@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String            @id @default(cuid())
+  name              String
+  email             String            @unique
+  password          String?
+  avatar            String?
+  plan              String            @default("free")
+  memberSince       String?
+  emailVerified     DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  wallets           Wallet[]
+  expenseCategories ExpenseCategory[]
+  incomeCategories  IncomeCategory[]
+  transactions      Transaction[]
+  debts             Debt[]
+  savingsGoals      SavingsGoal[]
+  licenseKeys       LicenseKey[]
+}
+
+model VerificationCode {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+model Wallet {
+  id                 String        @id @default(cuid())
+  name               String
+  type               String
+  balance            Float         @default(0)
+  color              String        @default("sky")
+  icon               String?
+  userId             String
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceTransactions Transaction[] @relation("SourceWallet")
+  targetTransactions Transaction[] @relation("TargetWallet")
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@index([userId])
+}
+
+model ExpenseCategory {
+  id               String   @id @default(cuid())
+  name             String
+  icon             String?
+  color            String   @default("#0ea5e9")
+  budgetPercentage Float    @default(0)
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model IncomeCategory {
+  id        String   @id @default(cuid())
+  name      String
+  icon      String?
+  color     String   @default("#10b981")
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  amount      Float
+  type        String
+  date        String
+  category    String
+  description String?
+  walletId    String
+  wallet      Wallet   @relation("SourceWallet", fields: [walletId], references: [id], onDelete: Cascade)
+  toWalletId  String?
+  toWallet    Wallet?  @relation("TargetWallet", fields: [toWalletId], references: [id], onDelete: SetNull)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([walletId])
+  @@index([date])
+}
+
+model Debt {
+  id              String   @id @default(cuid())
+  type            String
+  title           String
+  platform        String
+  totalAmount     Float
+  remainingAmount Float
+  minimumPayment  Float?
+  dueDate         String
+  status          String   @default("active")
+  notes           String?
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([dueDate])
+}
+
+model LicenseKey {
+  id           String    @id @default(cuid())
+  code         String    @unique
+  tier         String    @default("pro")
+  isUsed       Boolean   @default(false)
+  usedAt       DateTime?
+  usedByUserId String?
+  user         User?     @relation(fields: [usedByUserId], references: [id])
+  channel      String?
+  createdAt    DateTime  @default(now())
+
+  @@index([code])
+}
+
+model SavingsGoal {
+  id            String   @id @default(cuid())
+  title         String
+  targetAmount  Float
+  currentAmount Float    @default(0)
+  targetDate    String?
+  category      String?
+  color         String?  @default("#10b981")
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+}

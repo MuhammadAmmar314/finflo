@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panduan Akses & Buku Petunjuk FinFlo VIP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+    
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .page-sheet {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 20mm auto;
+      background: white;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      padding: 24mm 22mm;
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    @media print {
+      body {
+        background: transparent;
+        margin: 0;
+        padding: 0;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .page-sheet {
+        margin: 0;
+        width: 100%;
+        min-height: 100vh;
+        box-shadow: none;
+        page-break-after: always;
+        padding: 18mm 16mm;
+      }
+    }
+  </style>
+</head>
+<body class="py-8">
+
+  <!-- PRINT ACTION BAR (HIDDEN IN PRINT) -->
+  <div class="no-print max-w-4xl mx-auto mb-6 px-4 flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center font-bold">
+        PDF
+      </div>
+      <div>
+        <h2 class="text-sm font-bold text-slate-800">Draft Dokumen Panduan Pembeli Lynk.id</h2>
+        <p class="text-xs text-slate-500">Bisa langsung dicetak (Ctrl+P) -> Pilih "Save as PDF" atau copy teksnya ke Canva.</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-2">
+      <button onclick="window.print()" class="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-md transition-all">
+        🖨️ Cetak / Simpan sebagai PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- HALAMAN 1: COVER & AKSES UTAMA -->
+  <!-- ============================================================== -->
+  <div class="page-sheet flex flex-col justify-between">
+    <!-- Header Logo -->
+    <div>
+      <div class="flex items-center justify-between border-b border-slate-100 pb-5">
+        <div class="flex items-center space-x-3">
+          <img src="assets/logo-icon.svg" alt="FinFlo Logo" class="w-10 h-10">
+          <div>
+            <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">Fin<span class="text-sky-600">Flo</span></h1>
+            <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Your Smart Financial Flow</p>
+          </div>
+        </div>
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">
+          VIP LIFETIME ACCESS
+        </span>
+      </div>
+
+      <!-- Hero Welcome -->
+      <div class="mt-10 text-center">
+        <div class="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 mb-4">
+          <span>✓ Pembelian Berhasil Terverifikasi</span>
+        </div>
+        <h2 class="text-3xl font-extrabold text-slate-900 leading-tight">
+          Selamat Datang di <span class="text-sky-600">FinFlo</span> VIP!
+        </h2>
+        <p class="text-sm text-slate-600 mt-3 max-w-lg mx-auto leading-relaxed">
+          Terima kasih telah mempercayakan pengelolaan keuangan Anda bersama FinFlo. Aplikasi ini dirancang agar Anda bisa mencatat arus kas masuk, pengeluaran, serta mutasi dompet secara cerdas, rapi, dan 100% aman.
+        </p>
+      </div>
+
+      <!-- MAIN ACCESS CARD -->
+      <div class="mt-8 p-6 rounded-3xl bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-xl relative overflow-hidden">
+        <div class="relative z-10 text-center">
+          <p class="text-xs uppercase font-bold text-sky-200 tracking-wider">Tautan Resmi Aplikasi Anda</p>
+          <h3 class="text-xl font-extrabold mt-1">Buka Web Application FinFlo</h3>
+          
+          <div class="mt-4 p-3 bg-white/15 backdrop-blur-md rounded-2xl border border-white/20 inline-block max-w-md w-full">
+            <p class="text-xs text-white/80 font-mono">Link Akses Langsung:</p>
+            <p class="text-sm font-bold text-white font-mono break-all mt-0.5 select-all">
+              https://finflo-app.vercel.app
+            </p>
+          </div>
+
+          <div class="mt-5">
+            <a href="https://finflo-app.vercel.app" target="_blank" class="inline-block px-8 py-3 rounded-2xl bg-white text-sky-600 font-extrabold text-sm shadow-lg hover:bg-sky-50 transition-all">
+              👉 Klik di Sini untuk Mulai Mengakses FinFlo
+            </a>
+          </div>
+          <p class="text-[11px] text-white/70 mt-3 italic">*Tautan di atas dapat disimpan / di-bookmark di browser HP atau Komputer Anda.</p>
+        </div>
+      </div>
+
+      <!-- KREDENSIAL / LISENSI -->
+      <div class="mt-6 grid grid-cols-2 gap-4">
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tipe Lisensi</p>
+          <p class="text-sm font-bold text-slate-800 mt-1">Lifetime Member (Sekali Beli)</p>
+          <p class="text-[11px] text-slate-500 mt-0.5">Bebas biaya langganan bulanan</p>
+        </div>
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Metode Akses</p>
+          <p class="text-sm font-bold text-slate-800 mt-1">Akun Google / Instant Demo</p>
+          <p class="text-[11px] text-slate-500 mt-0.5">Langsung login dengan 1-klik</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Page 1 -->
+    <div class="pt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+      <span>FinFlo • Panduan Akses Pelanggan</span>
+      <span>Halaman 1 dari 3</span>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- HALAMAN 2: PANDUAN PENGGUNAAN CEPAT (QUICK START) -->
+  <!-- ============================================================== -->
+  <div class="page-sheet flex flex-col justify-between">
+    <div>
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+        <span class="text-xs font-bold text-sky-600 uppercase tracking-widest">Buku Panduan Ringkas</span>
+        <span class="text-xs text-slate-400">FinFlo User Manual</span>
+      </div>
+
+      <div class="mt-6">
+        <h2 class="text-2xl font-extrabold text-slate-900">3 Langkah Mudah Memulai FinFlo</h2>
+        <p class="text-xs text-slate-500 mt-1">Hanya butuh 3 menit untuk mengatur arus keuangan pribadi Anda.</p>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="mt-6 flex space-x-4">
+        <div class="w-9 h-9 rounded-2xl bg-sky-100 text-sky-600 font-extrabold flex items-center justify-center shrink-0 text-sm">
+          1
+        </div>
+        <div class="flex-1">
+          <h3 class="text-sm font-bold text-slate-900">Buka Aplikasi & Masuk (Login)</h3>
+          <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+            Buka link web app melalui browser (Google Chrome / Safari / Edge). Anda dapat menekan tombol <b>"Sign in with Google"</b> atau gunakan tombol <b>"Akses Cepat 1-Klik"</b> untuk langsung masuk ke dashboard.
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="mt-6 flex space-x-4">
+        <div class="w-9 h-9 rounded-2xl bg-teal-100 text-teal-600 font-extrabold flex items-center justify-center shrink-0 text-sm">
+          2
+        </div>
+        <div class="flex-1">
+          <h3 class="text-sm font-bold text-slate-900">Sesuaikan 3 Dompet Utama Anda</h3>
+          <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+            Masuk ke tab <b>"Dompet & Kategori"</b>. Sesuaikan nama dompet dan saldo riil yang Anda miliki saat ini:
+          </p>
+          <ul class="text-xs text-slate-600 list-disc list-inside mt-2 space-y-1">
+            <li><b>Dompet 1 (Tunai):</b> Uang cash di dompet fisik Anda.</li>
+            <li><b>Dompet 2 (Bank Utama):</b> Rekening bank harian (BCA, Mandiri, BRI, dll).</li>
+            <li><b>Dompet 3 (E-Wallet):</b> Saldo GoPay, OVO, Dana, atau ShopeePay.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="mt-6 flex space-x-4">
+        <div class="w-9 h-9 rounded-2xl bg-emerald-100 text-emerald-600 font-extrabold flex items-center justify-center shrink-0 text-sm">
+          3
+        </div>
+        <div class="flex-1">
+          <h3 class="text-sm font-bold text-slate-900">Mulai Catat Transaksi Setiap Hari</h3>
+          <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+            Tekan tombol <b>"+ Tambah Transaksi"</b> kapan saja Anda mengeluarkan atau menerima uang. Terdapat 3 opsi transaksi:
+          </p>
+          <div class="grid grid-cols-3 gap-2 mt-2">
+            <div class="p-2.5 rounded-xl bg-rose-50 border border-rose-100 text-center">
+              <span class="text-[11px] font-bold text-rose-700">Pengeluaran</span>
+              <p class="text-[10px] text-rose-500 mt-0.5">Memotong saldo dompet</p>
+            </div>
+            <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-100 text-center">
+              <span class="text-[11px] font-bold text-emerald-700">Pemasukan</span>
+              <p class="text-[10px] text-emerald-500 mt-0.5">Menambah saldo dompet</p>
+            </div>
+            <div class="p-2.5 rounded-xl bg-indigo-50 border border-indigo-100 text-center">
+              <span class="text-[11px] font-bold text-indigo-700">Transfer</span>
+              <p class="text-[10px] text-indigo-500 mt-0.5">Pindah saldo antar dompet</p>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-2.5">
+            💳 <b>Fitur Bonus:</b> Anda juga dapat melacak cicilan Paylater (SPayLater, GoPay Later) serta hutang & piutang teman lengkap dengan alarm tanggal jatuh tempo di tab <b>"Hutang & Paylater"</b>!
+          </p>
+        </div>
+      </div>
+
+      <!-- Security / LocalStorage Note -->
+      <div class="mt-8 p-4 rounded-2xl bg-amber-50 border border-amber-200">
+        <div class="flex items-start space-x-3">
+          <span class="text-lg">🔒</span>
+          <div>
+            <h4 class="text-xs font-bold text-amber-900">Privasi & Keamanan 100% Milik Anda</h4>
+            <p class="text-[11px] text-amber-800 mt-0.5 leading-relaxed">
+              Seluruh data transaksi dan nominal uang Anda <b>disimpan secara lokal di browser perangkat Anda (Local Storage)</b>. Kami tidak menyimpan nominal atau mutasi rekening Anda di server eksternal, sehingga data privasi finansial Anda dijamin bebas dari kebocoran data.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Page 2 -->
+    <div class="pt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+      <span>FinFlo • Panduan Akses Pelanggan</span>
+      <span>Halaman 2 dari 3</span>
+    </div>
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- HALAMAN 3: CARA INSTALL KE HOME SCREEN & SUPPORT -->
+  <!-- ============================================================== -->
+  <div class="page-sheet flex flex-col justify-between">
+    <div>
+      <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+        <span class="text-xs font-bold text-sky-600 uppercase tracking-widest">Tips Penggunaan & Bantuan</span>
+        <span class="text-xs text-slate-400">FinFlo Tips & Support</span>
+      </div>
+
+      <!-- Install to Home Screen Tips -->
+      <div class="mt-6">
+        <h2 class="text-2xl font-extrabold text-slate-900">Pasang FinFlo di Layar Utama HP</h2>
+        <p class="text-xs text-slate-500 mt-1">Jadikan FinFlo layaknya aplikasi native tanpa perlu mendownload dari App Store / Play Store.</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 mt-5">
+        <!-- Android Guide -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="flex items-center space-x-2 text-sm font-bold text-slate-900 mb-2">
+            <span>🤖 Untuk Pengguna Android (Chrome)</span>
+          </div>
+          <ol class="text-xs text-slate-600 space-y-1.5 list-decimal list-inside leading-relaxed">
+            <li>Buka link FinFlo di aplikasi <b>Google Chrome</b>.</li>
+            <li>Ketuk ikon <b>titik tiga (⋮)</b> di pojok kanan atas.</li>
+            <li>Pilih opsi <b>"Tambahkan ke Layar Utama"</b> (<i>Add to Home screen</i>).</li>
+            <li>Ikon FinFlo akan muncul di layar HP Anda dan siap dibuka dalam 1 ketukan!</li>
+          </ol>
+        </div>
+
+        <!-- iOS Guide -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="flex items-center space-x-2 text-sm font-bold text-slate-900 mb-2">
+            <span>🍏 Untuk Pengguna iPhone / iPad (Safari)</span>
+          </div>
+          <ol class="text-xs text-slate-600 space-y-1.5 list-decimal list-inside leading-relaxed">
+            <li>Buka link FinFlo di aplikasi <b>Safari</b>.</li>
+            <li>Ketuk tombol <b>Share</b> (ikon kotak dengan panah ke atas) di bagian bawah.</li>
+            <li>Gulir ke bawah dan pilih <b>"Add to Home Screen"</b> (+).</li>
+            <li>Ketuk <b>"Add"</b> di pojok kanan atas. Selesai!</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Backup Data Tips -->
+      <div class="mt-6 p-4 rounded-2xl bg-sky-50 border border-sky-100">
+        <h4 class="text-xs font-bold text-sky-900">💡 Tips Penting: Cadangkan Data Anda Secara Berkala</h4>
+        <p class="text-xs text-sky-800 mt-1 leading-relaxed">
+          Sebelum menghapus riwayat/cache browser atau saat ingin berpindah HP/Laptop, buka tab <b>Profil / Akun</b>, lalu klik tombol <b>"Unduh JSON"</b> untuk mengunduh file cadangan Anda. Anda juga bisa mengunduh riwayat transaksi ke format spreadsheet via tombol <b>"Ekspor CSV"</b>.
+        </p>
+      </div>
+
+      <!-- Support Channel Card -->
+      <div class="mt-6 p-5 rounded-3xl bg-slate-900 text-white shadow-md">
+        <div class="flex items-center justify-between">
+          <div>
+            <span class="text-[10px] font-bold text-sky-400 uppercase tracking-wider">Layanan Bantuan Pelanggan</span>
+            <h3 class="text-base font-bold mt-0.5">Butuh Bantuan atau Ada Pertanyaan?</h3>
+            <p class="text-xs text-slate-400 mt-1">Tim support kami siap membantu kendala teknis atau pertanyaan Anda.</p>
+          </div>
+          <div class="text-right">
+            <span class="inline-block px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-bold">
+              ● CS Online
+            </span>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div class="flex items-center space-x-2">
+            <span class="text-emerald-400 font-bold">WhatsApp Admin:</span>
+            <span class="font-mono text-slate-200">+62 812-XXXX-XXXX</span>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-sky-400 font-bold">Email Support:</span>
+            <span class="font-mono text-slate-200">support@finflo.id</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Footer Page 3 -->
+    <div class="pt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+      <span>FinFlo • Panduan Akses Pelanggan</span>
+      <span>Halaman 3 dari 3</span>
+    </div>
+  </div>
+
+</body>
+</html>
