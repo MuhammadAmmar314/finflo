@@ -69,13 +69,25 @@ export async function POST(
       });
 
       // 3. Create expense transaction
+      const existingCat = await tx.expenseCategory.findFirst({
+        where: {
+          userId: user.id,
+          OR: [
+            { name: { contains: 'Nabung', mode: 'insensitive' } },
+            { name: { contains: 'Tabung', mode: 'insensitive' } },
+            { name: { contains: 'Investasi', mode: 'insensitive' } },
+          ],
+        },
+      });
+      const categoryName = existingCat ? existingCat.name : 'Nabung & Investasi';
+
       const today = new Date().toISOString().split('T')[0];
       const createdTx = await tx.transaction.create({
         data: {
           amount: depositAmount,
           type: 'expense',
           date: today,
-          category: 'Tabungan & Investasi',
+          category: categoryName,
           description: `Setor tabungan: ${goal.title}`,
           walletId,
           userId: user.id,

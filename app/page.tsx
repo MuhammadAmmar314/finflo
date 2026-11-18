@@ -701,12 +701,20 @@ export default function FinFloApp() {
       return updated;
     });
 
+    const matchingSavingsCat = expenseCategories.find(
+      (c) =>
+        c.name.toLowerCase().includes('nabung') ||
+        c.name.toLowerCase().includes('tabung') ||
+        c.name.toLowerCase().includes('investasi')
+    );
+    const categoryName = matchingSavingsCat ? matchingSavingsCat.name : 'Nabung & Investasi';
+
     const newTx: Transaction = {
       id: tempTxId,
       amount,
       type: 'expense',
       date: new Date().toISOString().split('T')[0],
-      category: 'Tabungan & Investasi',
+      category: categoryName,
       description: `Setor tabungan: ${targetGoal?.title || 'Target Impian'}`,
       walletId: sourceWalletId,
     };
@@ -859,6 +867,7 @@ export default function FinFloApp() {
               wallets={wallets}
               expenseCategories={expenseCategories}
               transactions={transactions}
+              savingsGoals={savingsGoals}
               onOpenAddTransaction={() => {
                 setEditingTransaction(null);
                 setIsAddTransactionOpen(true);

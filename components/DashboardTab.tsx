@@ -26,7 +26,7 @@ import {
   Legend,
   ArcElement,
 } from 'chart.js';
-import { Transaction, Wallet, ExpenseCategory, User, TabType } from '@/lib/types';
+import { Transaction, Wallet, ExpenseCategory, User, TabType, SavingsGoal } from '@/lib/types';
 import { formatIDR, calculateStats, calculateFinancialHealth } from '@/lib/utils';
 
 // Register Chart.js components safely
@@ -47,6 +47,7 @@ interface DashboardTabProps {
   wallets: Wallet[];
   expenseCategories: ExpenseCategory[];
   transactions: Transaction[];
+  savingsGoals?: SavingsGoal[];
   onOpenAddTransaction: () => void;
   onOpenAddWallet: () => void;
   onOpenAddCategory: () => void;
@@ -59,6 +60,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
   wallets,
   expenseCategories,
   transactions,
+  savingsGoals = [],
   onOpenAddTransaction,
   onOpenAddWallet,
   onOpenAddCategory,
@@ -349,136 +351,92 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
         </div>
       </div>
 
-      {/* Recent Transactions & Side Widgets Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Transactions */}
-        <div className="lg:col-span-2 rounded-3xl border border-slate-200/80 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                Transaksi Terkini
-              </h3>
-              <p className="text-xs text-slate-500">Aktivitas keuangan terbaru Anda</p>
-            </div>
-            <button
-              onClick={() => onTabChange('transactions')}
-              className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 flex items-center gap-1"
-            >
-              <span>Lihat Semua</span>
-              <ArrowRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-
-          {recentTransactions.length === 0 ? (
-            <div className="py-8 text-center text-sm text-slate-400">
-              Belum ada transaksi tercatat.
-            </div>
-          ) : (
-            <div className="divide-y divide-slate-100 dark:divide-slate-800">
-              {recentTransactions.map((tx) => {
-                const isExpense = tx.type === 'expense';
-                const isIncome = tx.type === 'income';
-
-                return (
-                  <div key={tx.id} className="flex items-center justify-between py-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`flex h-10 w-10 items-center justify-center rounded-2xl ${
-                          isExpense
-                            ? 'bg-rose-100 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400'
-                            : isIncome
-                            ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400'
-                            : 'bg-sky-100 text-sky-600 dark:bg-sky-950/60 dark:text-sky-400'
-                        }`}
-                      >
-                        {isExpense ? (
-                          <ArrowDownRight className="h-5 w-5" />
-                        ) : isIncome ? (
-                          <ArrowUpRight className="h-5 w-5" />
-                        ) : (
-                          <ArrowLeftRight className="h-5 w-5" />
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-sm font-bold text-slate-900 dark:text-white">
-                          {tx.description || tx.category}
-                        </div>
-                        <div className="text-xs text-slate-400">
-                          {tx.category} • {tx.date}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div
-                      className={`font-mono text-sm font-bold ${
-                        isExpense
-                          ? 'text-rose-600 dark:text-rose-400'
-                          : isIncome
-                          ? 'text-emerald-600 dark:text-emerald-400'
-                          : 'text-sky-600 dark:text-sky-400'
-                      }`}
-                    >
-                      {isExpense ? '-' : isIncome ? '+' : ''}
-                      {formatIDR(tx.amount)}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Right Column: Wallets & Categories Quick Glance */}
-        <div className="space-y-6">
-          {/* Wallets widget */}
-          <div className="rounded-3xl border border-slate-200/80 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-            <div className="flex items-center justify-between mb-3">
+      {/* 2-Column Section (Setengah Layar: Transaksi Terkini 50% & Progress Budgeting 50%) */}
+      <div className={`grid grid-cols-1 ${budgetedCategories.length > 0 ? 'lg:grid-cols-2' : ''} gap-6`}>
+        {/* Kolom 1 (Setengah Layar): Transaksi Terkini */}
+        <div className="rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 dark:border-slate-800 dark:bg-slate-900 shadow-sm flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-                  Ringkasan Dompet
+                  Transaksi Terkini
                 </h3>
-                <p className="text-xs text-slate-500">
-                  {isPro ? 'Pro: Tanpa batas' : `Free: ${wallets.length}/3 Dompet`}
-                </p>
+                <p className="text-xs text-slate-500">Aktivitas keuangan terbaru Anda</p>
               </div>
               <button
-                onClick={onOpenAddWallet}
-                className="flex items-center gap-1 rounded-xl bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-600 hover:bg-brand-100 dark:bg-brand-950/50 dark:text-brand-400"
+                onClick={() => onTabChange('transactions')}
+                className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400 flex items-center gap-1 cursor-pointer"
               >
-                <Plus className="h-3.5 w-3.5" />
-                <span>Tambah</span>
+                <span>Lihat Semua</span>
+                <ArrowRight className="h-3.5 w-3.5" />
               </button>
             </div>
 
-            <div className="space-y-2.5">
-              {wallets.map((w) => (
-                <div
-                  key={w.id}
-                  className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/60 p-3 dark:border-slate-800 dark:bg-slate-800/40"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-500 text-white text-xs font-bold">
-                      {w.name.charAt(0)}
-                    </div>
-                    <div>
-                      <div className="text-xs font-bold text-slate-900 dark:text-white">
-                        {w.name}
-                      </div>
-                      <div className="text-[10px] text-slate-400 capitalize">{w.type}</div>
-                    </div>
-                  </div>
-                  <div className="font-mono text-xs font-bold text-slate-900 dark:text-white">
-                    {formatIDR(w.balance)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+            {recentTransactions.length === 0 ? (
+              <div className="py-12 text-center text-sm text-slate-400">
+                Belum ada transaksi tercatat.
+              </div>
+            ) : (
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {recentTransactions.map((tx) => {
+                  const isExpense = tx.type === 'expense';
+                  const isIncome = tx.type === 'income';
 
-          {/* Progress Budgeting Widget (Hanya tampil jika ada kategori yang diset budgeting-nya) */}
-          {budgetedCategories.length > 0 && (
-            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-              <div className="flex items-center justify-between mb-3">
+                  return (
+                    <div key={tx.id} className="flex items-center justify-between py-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div
+                          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${
+                            isExpense
+                              ? 'bg-rose-100 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400'
+                              : isIncome
+                              ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400'
+                              : 'bg-sky-100 text-sky-600 dark:bg-sky-950/60 dark:text-sky-400'
+                          }`}
+                        >
+                          {isExpense ? (
+                            <ArrowDownRight className="h-5 w-5" />
+                          ) : isIncome ? (
+                            <ArrowUpRight className="h-5 w-5" />
+                          ) : (
+                            <ArrowLeftRight className="h-5 w-5" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                            {tx.description || tx.category}
+                          </div>
+                          <div className="text-xs text-slate-400 truncate">
+                            {tx.category} • {tx.date}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        className={`font-mono text-sm font-bold shrink-0 ml-3 ${
+                          isExpense
+                            ? 'text-rose-600 dark:text-rose-400'
+                            : isIncome
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : 'text-sky-600 dark:text-sky-400'
+                        }`}
+                      >
+                        {isExpense ? '-' : isIncome ? '+' : ''}
+                        {formatIDR(tx.amount)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Kolom 2 (Setengah Layar): Progress Budgeting Bulan Ini */}
+        {budgetedCategories.length > 0 && (
+          <div className="rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 dark:border-slate-800 dark:bg-slate-900 shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                     Progress Budgeting Bulan Ini
@@ -495,16 +453,56 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
                 </button>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {budgetedCategories.map((c) => {
-                  const spent = transactions
+                  const isSavingsCategory = (name: string) => {
+                    const lower = name.toLowerCase();
+                    return (
+                      lower.includes('nabung') ||
+                      lower.includes('investasi') ||
+                      lower.includes('tabung')
+                    );
+                  };
+
+                  const isCategoryMatch = (txCat: string, catName: string) => {
+                    if (!txCat || !catName) return false;
+                    if (txCat.toLowerCase().trim() === catName.toLowerCase().trim()) return true;
+
+                    const norm = (s: string) =>
+                      s
+                        .toLowerCase()
+                        .replace(/tabungan/g, 'nabung')
+                        .replace(/simpanan/g, 'nabung')
+                        .replace(/[\/&]/g, ' ')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+
+                    const nTx = norm(txCat);
+                    const nCat = norm(catName);
+
+                    if (nTx === nCat) return true;
+
+                    if (isSavingsCategory(catName) && isSavingsCategory(txCat)) {
+                      return true;
+                    }
+
+                    return false;
+                  };
+
+                  const transactionSpent = transactions
                     .filter(
                       (tx) =>
                         tx.type === 'expense' &&
-                        tx.category === c.name &&
+                        isCategoryMatch(tx.category, c.name) &&
                         tx.date.startsWith(currentMonth)
                     )
                     .reduce((sum, tx) => sum + tx.amount, 0);
+
+                  const goalsAmount = isSavingsCategory(c.name)
+                    ? savingsGoals.reduce((sum, g) => sum + (g.currentAmount || 0), 0)
+                    : 0;
+
+                  const spent = Math.max(transactionSpent, goalsAmount);
 
                   const budgetNominal =
                     currentMonthIncome > 0
@@ -519,17 +517,17 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
                   const isOver = budgetNominal > 0 && spent > budgetNominal;
 
                   return (
-                    <div key={c.id} className="space-y-1.5">
+                    <div key={c.id} className="space-y-2">
                       <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5 min-w-0">
+                        <div className="flex items-center gap-2 min-w-0">
                           <span
-                            className="h-2 w-2 rounded-full shrink-0"
+                            className="h-2.5 w-2.5 rounded-full shrink-0"
                             style={{ backgroundColor: c.color }}
                           />
-                          <span className="font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[120px]">
+                          <span className="font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[220px] sm:max-w-xs">
                             {c.name}
                           </span>
-                          <span className="text-[10px] text-slate-400 shrink-0">
+                          <span className="text-[10px] text-slate-400 shrink-0 font-medium">
                             ({c.budgetPercentage}%)
                           </span>
                         </div>
@@ -556,7 +554,7 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
                         </div>
                       </div>
 
-                      <div className="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                      <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                         <div
                           className={`h-full rounded-full transition-all duration-500 ${
                             isOver
@@ -575,7 +573,52 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
                 })}
               </div>
             </div>
-          )}
+          </div>
+        )}
+      </div>
+
+      {/* Ringkasan Dompet (Di bawah 2 Kolom, Grid Lebar & Rapi) */}
+      <div className="rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 dark:border-slate-800 dark:bg-slate-900 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+              Ringkasan Dompet &amp; Rekening
+            </h3>
+            <p className="text-xs text-slate-500">
+              {isPro ? 'Pro: Dompet tanpa batas' : `Free: ${wallets.length}/3 Dompet aktif`}
+            </p>
+          </div>
+          <button
+            onClick={onOpenAddWallet}
+            className="flex items-center gap-1 rounded-xl bg-brand-50 px-3 py-1.5 text-xs font-semibold text-brand-600 hover:bg-brand-100 dark:bg-brand-950/50 dark:text-brand-400 cursor-pointer"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>Tambah</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          {wallets.map((w) => (
+            <div
+              key={w.id}
+              className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/70 p-3.5 dark:border-slate-800 dark:bg-slate-800/40 hover:border-brand-300 dark:hover:border-slate-700 transition"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-500 text-white text-xs font-bold shadow-sm">
+                  {w.name.charAt(0)}
+                </div>
+                <div className="min-w-0">
+                  <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                    {w.name}
+                  </div>
+                  <div className="text-[10px] text-slate-400 capitalize">{w.type}</div>
+                </div>
+              </div>
+              <div className="font-mono text-xs font-bold text-slate-900 dark:text-white shrink-0 ml-2">
+                {formatIDR(w.balance)}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
