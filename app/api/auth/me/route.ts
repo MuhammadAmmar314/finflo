@@ -19,9 +19,6 @@ export async function GET(request: NextRequest) {
         debts: {
           orderBy: { dueDate: 'asc' },
         },
-        savingsGoals: {
-          orderBy: { createdAt: 'desc' },
-        },
       },
     });
 
@@ -29,8 +26,27 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
     }
 
+    // Safely load savings goals
+    let userSavingsGoals: any[] = [];
+    try {
+      if ((prisma as any).savingsGoal) {
+        userSavingsGoals = await (prisma as any).savingsGoal.findMany({
+          where: { userId: user.id },
+          orderBy: { createdAt: 'desc' },
+        });
+      }
+    } catch {
+      userSavingsGoals = [];
+    }
+
     const { password: _, ...safeUser } = user;
-    return NextResponse.json({ success: true, data: safeUser });
+    return NextResponse.json({
+      success: true,
+      data: {
+        ...safeUser,
+        savingsGoals: userSavingsGoals,
+      },
+    });
   } catch (error) {
     return NextResponse.json(
       { success: false, error: 'Database connection failed' },

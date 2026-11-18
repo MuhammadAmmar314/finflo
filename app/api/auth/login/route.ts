@@ -30,9 +30,6 @@ export async function POST(request: NextRequest) {
         debts: {
           orderBy: { dueDate: 'asc' },
         },
-        savingsGoals: {
-          orderBy: { createdAt: 'desc' },
-        },
       },
     });
 
@@ -70,7 +67,6 @@ export async function POST(request: NextRequest) {
             incomeCategories: true,
             transactions: true,
             debts: true,
-            savingsGoals: true,
           },
         });
       } else {
@@ -110,10 +106,30 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Safely load savings goals
+    let userSavingsGoals: any[] = [];
+    try {
+      if ((prisma as any).savingsGoal) {
+        userSavingsGoals = await (prisma as any).savingsGoal.findMany({
+          where: { userId: user.id },
+          orderBy: { createdAt: 'desc' },
+        });
+      }
+    } catch {
+      userSavingsGoals = [];
+    }
+
     const { password: _, ...safeUser } = user;
-    return NextResponse.json({ success: true, data: safeUser });
+    return NextResponse.json({
+      success: true,
+      data: {
+        ...safeUser,
+        savingsGoals: userSavingsGoals,
+      },
+    });
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
+    console.error('[API /api/auth/login Error]:', error);
     const isDbError =
       msg.includes("Can't reach database server") ||
       msg.includes('P1001') ||
