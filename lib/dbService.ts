@@ -176,17 +176,24 @@ export async function apiDeleteCategory(id: string): Promise<boolean> {
 
 export async function apiAddDebt(
   debt: Omit<Debt, 'id' | 'createdAt' | 'status'>,
-  userEmail: string
-): Promise<Debt | null> {
+  userEmail: string,
+  initialImpact?: { walletId: string; affectWallet: boolean }
+): Promise<{ debt: Debt; wallet?: Wallet; transaction?: Transaction } | null> {
   try {
+    const payload = {
+      ...debt,
+      email: userEmail,
+      walletId: initialImpact?.walletId,
+      affectWallet: initialImpact?.affectWallet,
+    };
     const res = await fetch('/api/debts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...debt, email: userEmail }),
+      body: JSON.stringify(payload),
     });
     if (!res.ok) return null;
     const json = await res.json();
-    return json.success ? json.data : null;
+    return json.success ? (json.meta || { debt: json.data }) : null;
   } catch {
     return null;
   }
@@ -207,7 +214,7 @@ export async function apiPayDebt(
   walletId: string,
   isFullPayment: boolean,
   userEmail: string
-): Promise<{ debt: Debt; transaction: Transaction } | null> {
+): Promise<{ debt: Debt; wallet?: Wallet; transaction: Transaction } | null> {
   try {
     const res = await fetch(`/api/debts/${debtId}/pay`, {
       method: 'POST',

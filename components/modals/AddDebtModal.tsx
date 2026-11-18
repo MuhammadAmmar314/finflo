@@ -1,19 +1,25 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, CreditCard, Calendar, DollarSign, Layers } from 'lucide-react';
-import { Debt, DebtType } from '@/lib/types';
+import { X, CreditCard, Calendar, DollarSign, Layers, Wallet as WalletIcon } from 'lucide-react';
+import { Debt, DebtType, Wallet } from '@/lib/types';
+import { formatIDR } from '@/lib/utils';
 
 interface AddDebtModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddDebt: (debt: Omit<Debt, 'id' | 'createdAt' | 'status'>) => void;
+  onAddDebt: (
+    debt: Omit<Debt, 'id' | 'createdAt' | 'status'>,
+    initialImpact?: { walletId: string; affectWallet: boolean }
+  ) => void;
+  wallets?: Wallet[];
 }
 
 export const AddDebtModal: React.FC<AddDebtModalProps> = ({
   isOpen,
   onClose,
   onAddDebt,
+  wallets = [],
 }) => {
   const [title, setTitle] = useState('');
   const [type, setType] = useState<DebtType>('paylater');
@@ -22,6 +28,8 @@ export const AddDebtModal: React.FC<AddDebtModalProps> = ({
   const [minimumPayment, setMinimumPayment] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [notes, setNotes] = useState('');
+  const [affectWallet, setAffectWallet] = useState(true);
+  const [selectedWalletId, setSelectedWalletId] = useState(wallets[0]?.id || '');
 
   if (!isOpen) return null;
 
@@ -36,16 +44,24 @@ export const AddDebtModal: React.FC<AddDebtModalProps> = ({
       return;
     }
 
-    onAddDebt({
-      title: title.trim(),
-      type,
-      platform: platform.trim() || (type === 'paylater' ? 'PayLater' : 'Pribadi'),
-      totalAmount: total,
-      remainingAmount: total,
-      minimumPayment: minPay || undefined,
-      dueDate,
-      notes: notes.trim() || undefined,
-    });
+    const initialImpact =
+      (type === 'piutang' || type === 'hutang') && affectWallet && selectedWalletId
+        ? { walletId: selectedWalletId, affectWallet: true }
+        : undefined;
+
+    onAddDebt(
+      {
+        title: title.trim(),
+        type,
+        platform: platform.trim() || (type === 'paylater' ? 'PayLater' : 'Pribadi'),
+        totalAmount: total,
+        remainingAmount: total,
+        minimumPayment: minPay || undefined,
+        dueDate,
+        notes: notes.trim() || undefined,
+      },
+      initialImpact
+    );
 
     setTitle('');
     setTotalAmount('');
@@ -123,6 +139,51 @@ export const AddDebtModal: React.FC<AddDebtModalProps> = ({
               </button>
             </div>
           </div>
+
+          {/* Opsi Sinkronisasi Dompet untuk Piutang & Hutang */}
+          {wallets.length > 0 && (type === 'piutang' || type === 'hutang') && (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-3.5 dark:border-slate-800 dark:bg-slate-800/40 space-y-3">
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={affectWallet}
+                  onChange={(e) => setAffectWallet(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500 dark:border-slate-700 dark:bg-slate-800"
+                />
+                <div>
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                    {type === 'piutang'
+                      ? 'Potong saldo dompet sekarang'
+                      : 'Masukkan dana pinjaman ke dompet sekarang'}
+                  </span>
+                  <p className="text-[11px] text-slate-500">
+                    {type === 'piutang'
+                      ? 'Saldo dompet akan dipotong sejumlah pinjaman dan dicatat ke riwayat transaksi.'
+                      : 'Saldo dompet pilihan akan bertambah sebagai pencairan dana pinjaman.'}
+                  </p>
+                </div>
+              </label>
+
+              {affectWallet && (
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                    {type === 'piutang' ? 'Pilih Dompet Sumber Dana' : 'Pilih Dompet Penerima Dana'}
+                  </label>
+                  <select
+                    value={selectedWalletId}
+                    onChange={(e) => setSelectedWalletId(e.target.value)}
+                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-brand-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                  >
+                    {wallets.map((w) => (
+                      <option key={w.id} value={w.id}>
+                        {w.name} (Saldo: {formatIDR(w.balance)})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Judul Tagihan */}
           <div>

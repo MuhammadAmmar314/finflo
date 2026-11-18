@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X, CheckCircle, Wallet as WalletIcon, Calendar } from 'lucide-react';
+import { X, CheckCircle, Wallet as WalletIcon, Calendar, ArrowDownLeft, CreditCard } from 'lucide-react';
 import { Debt, Wallet } from '@/lib/types';
 import { formatIDR } from '@/lib/utils';
 
@@ -31,6 +31,7 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
 
   if (!isOpen || !debt) return null;
 
+  const isPiutang = debt.type === 'piutang';
   const remaining = debt.remainingAmount;
   const suggestedAmount = debt.minimumPayment && debt.minimumPayment < remaining
     ? debt.minimumPayment
@@ -50,11 +51,11 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
 
     const amountNum = parseFloat(payAmount.replace(/[^0-9]/g, '')) || 0;
     if (amountNum <= 0) {
-      alert('Masukkan nominal pembayaran yang valid.');
+      alert('Masukkan nominal yang valid.');
       return;
     }
     if (!selectedWalletId) {
-      alert('Pilih dompet untuk pembayaran.');
+      alert(isPiutang ? 'Pilih dompet untuk menerima dana.' : 'Pilih dompet untuk pembayaran.');
       return;
     }
 
@@ -76,12 +77,16 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
 
         {/* Header */}
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400">
-            <CheckCircle className="h-6 w-6" />
+          <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${
+            isPiutang
+              ? 'bg-teal-50 text-teal-600 dark:bg-teal-950/60 dark:text-teal-400'
+              : 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400'
+          }`}>
+            {isPiutang ? <ArrowDownLeft className="h-6 w-6" /> : <CreditCard className="h-6 w-6" />}
           </div>
           <div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              Bayar Cicilan / Tagihan
+              {isPiutang ? 'Terima Pembayaran Piutang' : 'Bayar Cicilan / Tagihan'}
             </h3>
             <p className="text-xs text-slate-500">{debt.title} • {debt.platform}</p>
           </div>
@@ -90,8 +95,12 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
         {/* Debt Status Card */}
         <div className="mt-4 rounded-2xl border border-slate-200/80 bg-slate-50/80 p-3.5 dark:border-slate-800 dark:bg-slate-800/40">
           <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-500">Sisa Tagihan Belum Lunas:</span>
-            <span className="font-mono font-bold text-rose-600 dark:text-rose-400">
+            <span className="text-slate-500">
+              {isPiutang ? 'Sisa Piutang Belum Diterima:' : 'Sisa Tagihan Belum Lunas:'}
+            </span>
+            <span className={`font-mono font-bold ${
+              isPiutang ? 'text-teal-600 dark:text-teal-400' : 'text-rose-600 dark:text-rose-400'
+            }`}>
               {formatIDR(debt.remainingAmount)}
             </span>
           </div>
@@ -110,7 +119,7 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
           {/* Nominal Pembayaran */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Nominal yang Dibayarkan (Rp)
+              {isPiutang ? 'Nominal yang Diterima (Rp)' : 'Nominal yang Dibayarkan (Rp)'}
             </label>
             <input
               type="text"
@@ -127,7 +136,7 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
           {/* Sumber Dompet */}
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Dipotong Dari Dompet
+              {isPiutang ? 'Masukkan ke Dompet Penerima' : 'Dipotong Dari Dompet'}
             </label>
             <select
               value={selectedWalletId}
@@ -151,7 +160,9 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
               className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
             />
             <span className="text-xs font-medium text-slate-700 dark:text-slate-300">
-              Tandai tagihan ini langsung lunas sepenuhnya
+              {isPiutang
+                ? 'Tandai piutang ini langsung lunas sepenuhnya'
+                : 'Tandai tagihan ini langsung lunas sepenuhnya'}
             </span>
           </label>
 
@@ -166,9 +177,13 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
             </button>
             <button
               type="submit"
-              className="rounded-xl bg-emerald-600 px-5 py-2 text-xs font-bold text-white shadow-md shadow-emerald-600/30 transition hover:bg-emerald-700 active:scale-95"
+              className={`rounded-xl px-5 py-2 text-xs font-bold text-white shadow-md transition active:scale-95 ${
+                isPiutang
+                  ? 'bg-teal-600 shadow-teal-600/30 hover:bg-teal-700'
+                  : 'bg-emerald-600 shadow-emerald-600/30 hover:bg-emerald-700'
+              }`}
             >
-              Konfirmasi Bayar
+              {isPiutang ? 'Konfirmasi Terima Dana' : 'Konfirmasi Bayar'}
             </button>
           </div>
         </form>

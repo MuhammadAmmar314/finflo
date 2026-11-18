@@ -488,6 +488,47 @@ export default function FinFloApp() {
           }
         }
 
+        // Sinkronisasi pembalikan status dan sisa tagihan pada catatan hutang/piutang terkait
+        let targetDebt: Debt | undefined;
+        if (tx.debtId) {
+          targetDebt = debts.find((d) => d.id === tx.debtId);
+        } else if (tx.description) {
+          if (tx.description.startsWith('Bayar cicilan: ')) {
+            const titlePart = tx.description.replace('Bayar cicilan: ', '').split('(')[0].trim();
+            targetDebt = debts.find(
+              (d) => d.title.toLowerCase() === titlePart.toLowerCase()
+            );
+          } else if (tx.description.startsWith('Terima pembayaran piutang: ')) {
+            const titlePart = tx.description.replace('Terima pembayaran piutang: ', '').trim();
+            targetDebt = debts.find(
+              (d) => d.title.toLowerCase() === titlePart.toLowerCase()
+            );
+          }
+        }
+
+        if (targetDebt) {
+          const debtId = targetDebt.id;
+          if (targetDebt.type === 'piutang' && tx.type === 'income') {
+            // Pelunasan dibatalkan: sisa piutang bertambah kembali
+            setDebts((prev) =>
+              prev.map((d) =>
+                d.id === debtId
+                  ? { ...d, remainingAmount: d.remainingAmount + tx.amount, status: 'active' }
+                  : d
+              )
+            );
+          } else if ((targetDebt.type === 'hutang' || targetDebt.type === 'paylater') && tx.type === 'expense') {
+            // Pembayaran cicilan dibatalkan: sisa hutang bertambah kembali
+            setDebts((prev) =>
+              prev.map((d) =>
+                d.id === debtId
+                  ? { ...d, remainingAmount: d.remainingAmount + tx.amount, status: 'active' }
+                  : d
+              )
+            );
+          }
+        }
+
         setTransactions((prev) => prev.filter((t) => t.id !== id));
         apiDeleteTransaction(id);
         showToast('Transaksi berhasil dihapus.', 'info');
@@ -603,7 +644,10 @@ export default function FinFloApp() {
     });
   };
 
-  const handleAddDebt = (debtData: Omit<Debt, 'id' | 'createdAt' | 'status'>) => {
+  const handleAddDebt = (
+    debtData: Omit<Debt, 'id' | 'createdAt' | 'status'>,
+    initialImpact?: { walletId: string; affectWallet: boolean }
+  ) => {
     const tempId = `debt_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`;
     const newDebt: Debt = {
       ...debtData,
@@ -613,9 +657,61 @@ export default function FinFloApp() {
     };
     setDebts((prev) => [...prev, newDebt]);
 
-    apiAddDebt(debtData, user?.email || defaultUser.email).then((saved) => {
-      if (saved?.id) {
-        setDebts((prev) => prev.map((d) => (d.id === tempId ? saved : d)));
+    // Initial wallet and transaction impact if affectWallet is true
+    if (initialImpact?.affectWallet && initialImpact.walletId) {
+      const today = new Date().toISOString().split('T')[0];
+      const tempTxId = `tx_init_debt_${Date.now()}`;
+
+      if (debtData.type === 'piutang') {
+        // Saldo dompet berkurang karena dipinjamkan
+        setWallets((prev) =>
+          prev.map((w) =>
+            w.id === initialImpact.walletId ? { ...w, balance: w.balance - debtData.totalAmount } : w
+          )
+        );
+        const initTx: Transaction = {
+          id: tempTxId,
+          type: 'expense',
+          amount: debtData.totalAmount,
+          walletId: initialImpact.walletId,
+          category: 'Pinjaman & Piutang',
+          date: today,
+          description: `Pinjamkan uang ke: ${debtData.title}`,
+          debtId: tempId,
+        };
+        setTransactions((prev) => [initTx, ...prev]);
+      } else if (debtData.type === 'hutang') {
+        // Saldo dompet bertambah karena pencairan pinjaman
+        setWallets((prev) =>
+          prev.map((w) =>
+            w.id === initialImpact.walletId ? { ...w, balance: w.balance + debtData.totalAmount } : w
+          )
+        );
+        const initTx: Transaction = {
+          id: tempTxId,
+          type: 'income',
+          amount: debtData.totalAmount,
+          walletId: initialImpact.walletId,
+          category: 'Pencairan Pinjaman',
+          date: today,
+          description: `Pencairan pinjaman: ${debtData.title}`,
+          debtId: tempId,
+        };
+        setTransactions((prev) => [initTx, ...prev]);
+      }
+    }
+
+    apiAddDebt(debtData, user?.email || defaultUser.email, initialImpact).then((result) => {
+      if (result?.debt?.id) {
+        setDebts((prev) => prev.map((d) => (d.id === tempId ? result.debt : d)));
+        if (result.wallet) {
+          setWallets((prev) => prev.map((w) => (w.id === result.wallet!.id ? result.wallet! : w)));
+        }
+        if (result.transaction) {
+          setTransactions((prev) =>
+            prev.map((t) => (t.debtId === tempId ? { ...result.transaction!, debtId: result.debt.id } : t))
+          );
+        }
       }
     });
 
@@ -631,22 +727,39 @@ export default function FinFloApp() {
     const targetDebt = debts.find((d) => d.id === debtId);
     if (!targetDebt) return;
 
+    const isPiutang = targetDebt.type === 'piutang';
+    const tempTxId = `tx_pay_${Date.now()}`;
+    const today = new Date().toISOString().split('T')[0];
+
+    // 1. Optimistic wallet update
     setWallets((prev) =>
-      prev.map((w) => (w.id === walletId ? { ...w, balance: w.balance - amount } : w))
+      prev.map((w) => {
+        if (w.id === walletId) {
+          return {
+            ...w,
+            balance: isPiutang ? w.balance + amount : w.balance - amount,
+          };
+        }
+        return w;
+      })
     );
 
-    const tempTxId = `tx_pay_${Date.now()}`;
+    // 2. Optimistic transaction creation
     const newTx: Transaction = {
       id: tempTxId,
-      type: 'expense',
-      amount: amount,
+      type: isPiutang ? 'income' : 'expense',
+      amount,
       walletId,
-      category: 'Tagihan & Utilitas',
-      date: new Date().toISOString().split('T')[0],
-      description: `Bayar cicilan: ${targetDebt.title} (${targetDebt.platform})`,
+      category: isPiutang ? 'Pelunasan Piutang' : 'Cicilan & Hutang',
+      date: today,
+      description: isPiutang
+        ? `Terima pembayaran piutang: ${targetDebt.title}`
+        : `Bayar cicilan: ${targetDebt.title} (${targetDebt.platform})`,
+      debtId,
     };
     setTransactions((prev) => [newTx, ...prev]);
 
+    // 3. Optimistic debt update
     setDebts((prev) =>
       prev.map((d) => {
         if (d.id === debtId) {
@@ -661,7 +774,12 @@ export default function FinFloApp() {
       })
     );
 
-    showToast(`Pembayaran Rp ${amount.toLocaleString('id-ID')} berhasil dicatat!`, 'success');
+    showToast(
+      isPiutang
+        ? `Penerimaan dana Rp ${amount.toLocaleString('id-ID')} berhasil dicatat!`
+        : `Pembayaran cicilan Rp ${amount.toLocaleString('id-ID')} berhasil dicatat!`,
+      'success'
+    );
 
     try {
       const res = await apiPayDebt(debtId, amount, walletId, isFullPayment, user?.email || defaultUser.email);
@@ -669,6 +787,11 @@ export default function FinFloApp() {
         if (res.transaction) {
           setTransactions((prev) =>
             prev.map((t) => (t.id === tempTxId ? res.transaction : t))
+          );
+        }
+        if (res.wallet) {
+          setWallets((prev) =>
+            prev.map((w) => (w.id === walletId ? res.wallet! : w))
           );
         }
         if (res.debt) {
@@ -1215,6 +1338,7 @@ export default function FinFloApp() {
         isOpen={isAddDebtOpen}
         onClose={() => setIsAddDebtOpen(false)}
         onAddDebt={handleAddDebt}
+        wallets={wallets}
       />
 
       <PayDebtModal

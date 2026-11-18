@@ -94,6 +94,8 @@ model Transaction {
   toWallet      Wallet?      @relation("TargetWallet", fields: [toWalletId], references: [id], onDelete: SetNull)
   savingsGoalId String?
   savingsGoal   SavingsGoal? @relation(fields: [savingsGoalId], references: [id], onDelete: SetNull)
+  debtId        String?
+  debt          Debt?        @relation(fields: [debtId], references: [id], onDelete: SetNull)
   userId        String
   user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt     DateTime     @default(now())
@@ -102,11 +104,12 @@ model Transaction {
   @@index([userId])
   @@index([walletId])
   @@index([savingsGoalId])
+  @@index([debtId])
   @@index([date])
 }
 
 model Debt {
-  id              String   @id @default(cuid())
+  id              String        @id @default(cuid())
   type            String
   title           String
   platform        String
@@ -114,12 +117,13 @@ model Debt {
   remainingAmount Float
   minimumPayment  Float?
   dueDate         String
-  status          String   @default("active")
+  status          String        @default("active")
   notes           String?
   userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions    Transaction[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
 
   @@index([userId])
   @@index([dueDate])

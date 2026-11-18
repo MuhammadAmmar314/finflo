@@ -174,7 +174,58 @@ export async function DELETE(
         }
       }
 
-      // 3. Delete the transaction
+      // 3. Roll back linked Debt if this was a debt payment or piutang repayment
+      let debtIdToUpdate = existingTx.debtId;
+      if (!debtIdToUpdate && existingTx.description) {
+        if (existingTx.description.startsWith('Bayar cicilan: ')) {
+          const titlePart = existingTx.description.replace('Bayar cicilan: ', '').split('(')[0].trim();
+          const matchedDebt = await tx.debt.findFirst({
+            where: {
+              userId: existingTx.userId,
+              title: { equals: titlePart, mode: 'insensitive' },
+            },
+          });
+          if (matchedDebt) debtIdToUpdate = matchedDebt.id;
+        } else if (existingTx.description.startsWith('Terima pembayaran piutang: ')) {
+          const titlePart = existingTx.description.replace('Terima pembayaran piutang: ', '').trim();
+          const matchedDebt = await tx.debt.findFirst({
+            where: {
+              userId: existingTx.userId,
+              title: { equals: titlePart, mode: 'insensitive' },
+            },
+          });
+          if (matchedDebt) debtIdToUpdate = matchedDebt.id;
+        }
+      }
+
+      if (debtIdToUpdate) {
+        const debt = await tx.debt.findUnique({
+          where: { id: debtIdToUpdate },
+        });
+        if (debt) {
+          if (debt.type === 'piutang' && existingTx.type === 'income') {
+            // Pelunasan piutang dibatalkan: sisa piutang bertambah kembali
+            await tx.debt.update({
+              where: { id: debtIdToUpdate },
+              data: {
+                remainingAmount: { increment: existingTx.amount },
+                status: 'active',
+              },
+            });
+          } else if ((debt.type === 'hutang' || debt.type === 'paylater') && existingTx.type === 'expense') {
+            // Pembayaran cicilan dibatalkan: sisa hutang bertambah kembali
+            await tx.debt.update({
+              where: { id: debtIdToUpdate },
+              data: {
+                remainingAmount: { increment: existingTx.amount },
+                status: 'active',
+              },
+            });
+          }
+        }
+      }
+
+      // 4. Delete the transaction
       await tx.transaction.delete({
         where: { id },
       });

@@ -361,10 +361,14 @@ export const DebtsTab: React.FC<DebtsTabProps> = ({
                     </div>
                     <button
                       onClick={() => onOpenPayDebt(item)}
-                      className="flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 active:scale-95"
+                      className={`flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-bold text-white shadow-sm active:scale-95 ${
+                        item.type === 'piutang'
+                          ? 'bg-teal-600 hover:bg-teal-700'
+                          : 'bg-emerald-600 hover:bg-emerald-700'
+                      }`}
                     >
                       <DollarSign className="h-3.5 w-3.5" />
-                      <span>Bayar Cicilan</span>
+                      <span>{item.type === 'piutang' ? 'Terima Pembayaran' : 'Bayar Cicilan'}</span>
                     </button>
                   </div>
                 )}
