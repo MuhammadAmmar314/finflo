@@ -167,6 +167,13 @@ export function calculateFinancialHealth(
     tx.date ? tx.date.startsWith(currentMonth) : true
   );
 
+  // Income excluding internal savings withdrawals
+  const operationalIncome = currentMonthTransactions
+    .filter((tx) => tx.type === 'income' && !tx.category.toLowerCase().includes('tarik tabungan'))
+    .reduce((sum, tx) => sum + tx.amount, 0);
+
+  const incomeBasis = operationalIncome > 0 ? operationalIncome : stats.totalIncome;
+
   // Compute category audits from user's actual categories
   const categoryAudits: CategoryBudgetAudit[] = expenseCategories
     .filter((c) => (c.budgetPercentage || 0) > 0)
@@ -175,21 +182,18 @@ export function calculateFinancialHealth(
         .filter((tx) => tx.type === 'expense' && isCategoryMatch(tx.category, c.name))
         .reduce((sum, tx) => sum + tx.amount, 0);
 
-      const goalsAmount = isSavingsCategory(c.name)
-        ? (savingsGoals || []).reduce((sum, g) => sum + (g.currentAmount || 0), 0)
-        : 0;
-
-      const spent = Math.max(transactionSpent, goalsAmount);
+      // Realisasi budgeting bulanan murni dari setoran bulan berjalan (tidak berkurang saat ada penarikan)
+      const spent = transactionSpent;
 
       const realRate =
-        stats.totalIncome > 0
-          ? Math.round((spent / stats.totalIncome) * 100)
+        incomeBasis > 0
+          ? Math.round((spent / incomeBasis) * 100)
           : stats.totalExpense > 0
           ? Math.round((spent / stats.totalExpense) * 100)
           : 0;
 
       const targetRate = c.budgetPercentage;
-      const budgetNominal = stats.totalIncome > 0 ? (targetRate / 100) * stats.totalIncome : 0;
+      const budgetNominal = incomeBasis > 0 ? (targetRate / 100) * incomeBasis : 0;
       const isOver = targetRate > 0 && realRate > targetRate;
 
       let statusNote = 'Sesuai dengan target anggaran.';

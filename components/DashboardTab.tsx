@@ -84,9 +84,14 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
   // Current month string 'YYYY-MM'
   const currentMonth = new Date().toISOString().slice(0, 7);
 
-  // Monthly income for current month
+  // Monthly income for current month (excluding internal savings withdrawals)
   const currentMonthIncome = transactions
-    .filter((tx) => tx.type === 'income' && tx.date.startsWith(currentMonth))
+    .filter(
+      (tx) =>
+        tx.type === 'income' &&
+        tx.date.startsWith(currentMonth) &&
+        !tx.category.toLowerCase().includes('tarik tabungan')
+    )
     .reduce((sum, tx) => sum + tx.amount, 0);
 
   // Budgeted categories (only those with budgetPercentage > 0)
@@ -498,11 +503,8 @@ export const DashboardTab: React.FC<DashboardTabProps> = ({
                     )
                     .reduce((sum, tx) => sum + tx.amount, 0);
 
-                  const goalsAmount = isSavingsCategory(c.name)
-                    ? savingsGoals.reduce((sum, g) => sum + (g.currentAmount || 0), 0)
-                    : 0;
-
-                  const spent = Math.max(transactionSpent, goalsAmount);
+                  // Realisasi menabung bulanan murni berasal dari setoran bulan ini (tidak berkurang saat ada penarikan)
+                  const spent = transactionSpent;
 
                   const budgetNominal =
                     currentMonthIncome > 0
